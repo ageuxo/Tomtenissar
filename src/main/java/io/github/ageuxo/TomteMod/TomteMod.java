@@ -7,13 +7,11 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;
 
 @Mod(TomteMod.MODID)
-public class TomteMod
-{
+public class TomteMod {
     public static final String MODID = "tomtemod";
     private static final Logger LOGGER = LogUtils.getLogger();
 
-    public TomteMod()
-    {
+    public TomteMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
 
