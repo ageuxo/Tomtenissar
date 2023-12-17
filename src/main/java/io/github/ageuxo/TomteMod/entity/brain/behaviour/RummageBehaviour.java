@@ -35,12 +35,15 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
 
     public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(
             Pair.of(ModMemoryTypes.RUMMAGE_TARGET.get(), MemoryStatus.VALUE_PRESENT),
-            Pair.of(ModMemoryTypes.ITEM_VALUE_POS.get(), MemoryStatus.REGISTERED)
+            Pair.of(ModMemoryTypes.ITEM_VALUE_POS.get(), MemoryStatus.REGISTERED),
+            Pair.of(MemoryModuleType.WALK_TARGET, MemoryStatus.VALUE_ABSENT)
     );
 
     public RummageBehaviour() {
         super(DELAY_TICKS);
         this.whenActivating(this::evaluateInventory);
+        this.runFor((e -> e.getRandom().nextIntBetweenInclusive(30, 90)));
+        this.cooldownFor(e -> e.getRandom().nextInt(30));
     }
 
     @Override
@@ -62,7 +65,7 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
         Pair<BlockPos, BlockEntityType<?>> pair = BrainUtils.getMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
         if (pair == null) return false;
         Optional<? extends BlockEntity> optional = level.getBlockEntity(pair.getFirst(), pair.getSecond());
-        if (optional.isPresent()){
+        if (pair.getFirst().getCenter().closerThan(entity.position(), 1.73D) && optional.isPresent()){
             BlockEntity blockEntity = optional.get();
             LazyOptional<IItemHandler> cap = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER);
             this.target = cap;
