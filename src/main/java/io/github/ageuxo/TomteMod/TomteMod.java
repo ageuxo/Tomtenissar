@@ -2,6 +2,8 @@ package io.github.ageuxo.TomteMod;
 
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
+import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
+import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
 import io.github.ageuxo.TomteMod.entity.client.BaseTomteModel;
 import io.github.ageuxo.TomteMod.entity.client.BaseTomteRenderer;
 import io.github.ageuxo.TomteMod.entity.client.ModModelLayers;
@@ -23,7 +25,9 @@ public class TomteMod {
 
     public TomteMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-        ModEntities.ENTITY_TYPES.register(modEventBus);
+        ModEntities.register(modEventBus);
+        ModMemoryTypes.register(modEventBus);
+        ModSensors.register(modEventBus);
 
         modEventBus.register(ModEvents.class);
 
