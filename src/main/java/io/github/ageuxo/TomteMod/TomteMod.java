@@ -28,6 +28,7 @@ public class TomteMod {
         ModEntities.register(modEventBus);
         ModMemoryTypes.register(modEventBus);
         ModSensors.register(modEventBus);
+        ModPoiTypes.register(modEventBus);
 
         modEventBus.register(ModEvents.class);
 
