@@ -100,4 +100,9 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
             }
         }
     }
+
+    @Override
+    protected void stop(E entity) {
+        BrainUtils.clearMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
+    }
 }
