@@ -17,6 +17,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
-
+//        this.tag(ModTags.STEALABLE_CONTAINER).add(Blocks.CHEST, Blocks.BARREL);
     }
 }
