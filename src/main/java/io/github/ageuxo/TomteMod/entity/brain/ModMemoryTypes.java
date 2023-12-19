@@ -27,6 +27,8 @@ public class ModMemoryTypes {
     public static final Codec<List<Pair<BlockPos, BlockEntityType<?>>>> NEARBY_BLOCK_ENTITIES_CODEC = Codec.pair(BlockPos.CODEC, BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec()).listOf();
     public static final RegistryObject<MemoryModuleType<List<Pair<BlockPos, BlockEntityType<?>>>>> NEARBY_BLOCK_ENTITIES = MEMORY_TYPES.register("nearby_block_entities", ()->new MemoryModuleType<>(Optional.of(NEARBY_BLOCK_ENTITIES_CODEC)));
 
+    public static final RegistryObject<MemoryModuleType<BlockPos>> STEAL_TARGET = MEMORY_TYPES.register("steal_target", ()->new MemoryModuleType<>(Optional.of(BlockPos.CODEC)));
+
     public static final RegistryObject<MemoryModuleType<Pair<BlockPos, BlockEntityType<?>>>> RUMMAGE_TARGET = MEMORY_TYPES.register("rummage_target", ()->new MemoryModuleType<>(Optional.of(Codec.pair(BlockPos.CODEC, BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec()))));
 
     public static void register(IEventBus bus){

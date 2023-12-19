@@ -1,8 +1,6 @@
 package io.github.ageuxo.TomteMod.entity;
 
-import io.github.ageuxo.TomteMod.entity.brain.behaviour.RummageBehaviour;
-import io.github.ageuxo.TomteMod.entity.brain.behaviour.SetWalkAndRummageTargetToInventory;
-import io.github.ageuxo.TomteMod.entity.brain.behaviour.StealBehaviour;
+import io.github.ageuxo.TomteMod.entity.brain.behaviour.*;
 import io.github.ageuxo.TomteMod.entity.brain.sensor.NearbyBlockEntitiesSensor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
@@ -15,6 +13,7 @@ import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
@@ -32,6 +31,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTar
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
+import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 
@@ -71,10 +71,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return ObjectArrayList.of(
                 new NearbyLivingEntitySensor<>(),
                 new HurtBySensor<>(),
-                new NearbyBlockEntitiesSensor<BaseTomte>()
-                        .setInventoryCapabilityPredicate()
-                        .setRadius(3, 1)
-                        .scanPredicate(baseTomte -> baseTomte.getMood() < 10)
+                new NearbyBlocksSensor<BaseTomte>()
+                        .setRadius(3)
+                        .setPredicate((state, entity) -> state.is(Blocks.CHEST))
         );
     }
 
@@ -116,10 +115,8 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return Map.of(Activity.CORE,
             new BrainActivityGroup<BaseTomte>(Activity.CORE)
                 .behaviours(
-                    new SetWalkAndRummageTargetToInventory<>(),
-                    new RummageBehaviour<>()
-                            .cooldownFor(pathfinderMob -> 600),
-                    new StealBehaviour<>()
+                        new SetWalkAndSimpleStealTarget<>(),
+                        new SimpleStealingBehaviour<>()
                 ));
     }
 
