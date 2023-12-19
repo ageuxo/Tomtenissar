@@ -57,9 +57,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public final AnimationState idleAnimationState = new AnimationState();
     private int idleAnimationTimeout = 0;
     public final AnimationState stealAnimationState = new AnimationState();
-    private int stealAnimationTimeout = 0;
     public final AnimationState attackAnimationState = new AnimationState();
-    private int attackAnimationTimeout = 0;
 
     @Override
     public void tick() {
@@ -78,40 +76,8 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
             --this.idleAnimationTimeout;
         }
 
-        // Steal
-        if (this.isStealing() && this.stealAnimationTimeout <= 0){
-            this.stealAnimationTimeout = 15; // anim length in ticks
-            this.stealAnimationState.start(this.tickCount);
-        } else {
-            --this.stealAnimationTimeout;
-        }
-
-        if (!this.isStealing()){
-            stealAnimationState.stop();
-        }
-
-        // Attack
-        if (this.isAttacking() && this.attackAnimationTimeout <= 0){
-            this.attackAnimationTimeout = 15; // anim length in ticks
-            this.attackAnimationState.start(this.tickCount);
-        } else {
-            --this.attackAnimationTimeout;
-        }
-
-        if (!this.isStealing()){
-            attackAnimationState.stop();
-        }
-    }
-
-    @Override
-    protected void updateWalkAnimation(float pPartialTick) {
-        float state;
-        if (this.getPose() == Pose.STANDING){
-            state = Math.min(pPartialTick * 0.6f, 1.0f);
-        } else {
-            state = 0.0f;
-        }
-        this.walkAnimation.update(state, 0.2f);
+        this.attackAnimationState.animateWhen(this.isAttacking(), tickCount);
+        this.stealAnimationState.animateWhen(this.isStealing(), tickCount);
     }
 
     public static AttributeSupplier.Builder createAttributes(){
