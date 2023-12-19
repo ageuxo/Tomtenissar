@@ -1,11 +1,16 @@
 package io.github.ageuxo.TomteMod.entity;
 
-import io.github.ageuxo.TomteMod.entity.brain.behaviour.*;
-import io.github.ageuxo.TomteMod.entity.brain.sensor.NearbyBlockEntitiesSensor;
+import io.github.ageuxo.TomteMod.entity.brain.behaviour.SetWalkAndSimpleStealTarget;
+import io.github.ageuxo.TomteMod.entity.brain.behaviour.SimpleStealingBehaviour;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.syncher.EntityDataAccessor;
+import net.minecraft.network.syncher.EntityDataSerializers;
+import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -40,10 +45,73 @@ import java.util.Map;
 
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte> {
     public static final String MOOD_NBT_KEY = "tomte_mood";
+    private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
+
     private int mood = 0;
 
     public BaseTomte(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    public final AnimationState idleAnimationState = new AnimationState();
+    private int idleAnimationTimeout = 0;
+    public final AnimationState stealAnimationState = new AnimationState();
+    private int stealAnimationTimeout = 0;
+    public final AnimationState attackAnimationState = new AnimationState();
+    private int attackAnimationTimeout = 0;
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.level().isClientSide){
+            setupAnimationStates();
+        }
+    }
+
+    private void setupAnimationStates(){
+        // Idle
+        if (this.idleAnimationTimeout <= 0){
+            this.idleAnimationTimeout = this.getRandom().nextInt(40) + 80;
+            this.idleAnimationState.start(this.tickCount);
+        } else {
+            --this.idleAnimationTimeout;
+        }
+
+        // Steal
+        if (this.isStealing() && this.stealAnimationTimeout <= 0){
+            this.stealAnimationTimeout = 15; // anim length in ticks
+            this.stealAnimationState.start(this.tickCount);
+        } else {
+            --this.stealAnimationTimeout;
+        }
+
+        if (!this.isStealing()){
+            stealAnimationState.stop();
+        }
+
+        // Attack
+        if (this.isAttacking() && this.attackAnimationTimeout <= 0){
+            this.attackAnimationTimeout = 15; // anim length in ticks
+            this.attackAnimationState.start(this.tickCount);
+        } else {
+            --this.attackAnimationTimeout;
+        }
+
+        if (!this.isStealing()){
+            attackAnimationState.stop();
+        }
+    }
+
+    @Override
+    protected void updateWalkAnimation(float pPartialTick) {
+        float state;
+        if (this.getPose() == Pose.STANDING){
+            state = Math.min(pPartialTick * 0.6f, 1.0f);
+        } else {
+            state = 0.0f;
+        }
+        this.walkAnimation.update(state, 0.2f);
     }
 
     public static AttributeSupplier.Builder createAttributes(){
@@ -54,6 +122,13 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                 .add(Attributes.ATTACK_DAMAGE, 3.0D)
                 .add(Attributes.ATTACK_KNOCKBACK, 1.0D)
                 .add(Attributes.ARMOR_TOUGHNESS, 1.0D);
+    }
+
+    @Override
+    protected void defineSynchedData() {
+        super.defineSynchedData();
+        this.entityData.define(ATTACKING, false);
+        this.entityData.define(STEALING, false);
     }
 
     @Override
@@ -106,7 +181,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(),
                 new SetWalkTargetToAttackTarget<>(),
-                new AnimatableMeleeAttack<>(0)
+                new AnimatableMeleeAttack<BaseTomte>(5)
+                        .attackInterval((tomte)->11)
+                        .whenStarting(tomte -> tomte.setAttacking(true))
         );
     }
 
@@ -134,5 +211,21 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
 
     public int getMood() {
         return mood;
+    }
+
+    public void setAttacking(boolean attacking){
+        this.entityData.set(ATTACKING, attacking);
+    }
+
+    public boolean isAttacking(){
+        return this.entityData.get(ATTACKING);
+    }
+
+    public void setStealing(boolean stealing){
+        this.entityData.set(STEALING, stealing);
+    }
+
+    public boolean isStealing(){
+        return this.entityData.get(STEALING);
     }
 }

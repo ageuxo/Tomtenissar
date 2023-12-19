@@ -7,6 +7,7 @@ import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
 import io.github.ageuxo.TomteMod.entity.client.BaseTomteModel;
 import io.github.ageuxo.TomteMod.entity.client.BaseTomteRenderer;
 import io.github.ageuxo.TomteMod.entity.client.ModModelLayers;
+import io.github.ageuxo.TomteMod.entity.client.TomteModel;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -41,7 +42,7 @@ public class TomteMod {
     public static class ClientModEvents{
         @SubscribeEvent
         public static void registerLayers(EntityRenderersEvent.RegisterLayerDefinitions event){
-            event.registerLayerDefinition(ModModelLayers.TOMTE_LAYER, BaseTomteModel::createBodyLayer);
+            event.registerLayerDefinition(ModModelLayers.TOMTE_LAYER, TomteModel::createBodyLayer);
         }
 
         @SubscribeEvent

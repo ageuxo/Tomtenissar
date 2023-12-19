@@ -29,9 +29,9 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     );
 
     public SimpleStealingBehaviour() {
-        super(20);//TODO hook up anim time
-        this.runFor((e -> e.getRandom().nextIntBetweenInclusive(30, 90)));
-        this.cooldownFor(e -> e.getRandom().nextInt(30));
+        super(7);
+        this.runFor(e -> 15);
+        this.cooldownFor(e -> e.getRandom().nextIntBetweenInclusive(30, 90));
     }
 
     @Override
@@ -42,17 +42,23 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     @Override
     protected void start(E entity) {
         LOGGER.debug("start");
-        //TODO anims here
+        entity.setStealing(true);
         entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
+        BrainUtils.clearMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
         super.start(entity);
     }
 
     @Override
+    protected void stop(E entity) {
+        entity.setStealing(false);
+    }
+
+    @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        LOGGER.debug("checkExtraStartConditions");
         if (level.getGameTime() - this.lastCheck < this.checkCooldown || level.getRandom().nextInt(2) != 1) {
             return false;
         } else if (entity.getMood() < 10){ //TODO tweak this
+            LOGGER.debug("checkExtraStartConditions");
             this.pos = BrainUtils.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
             this.lastCheck = level.getGameTime();
             return this.pos.closerToCenterThan(entity.position(), this.minDistance);
