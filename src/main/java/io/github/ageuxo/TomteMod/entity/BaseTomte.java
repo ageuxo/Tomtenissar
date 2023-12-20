@@ -1,5 +1,6 @@
 package io.github.ageuxo.TomteMod.entity;
 
+import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.SetWalkAndSimpleStealTarget;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.SimpleStealingBehaviour;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
@@ -10,15 +11,16 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.PathfinderMob;
-import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.items.ItemStackHandler;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
@@ -39,15 +41,18 @@ import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
+import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
 
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte> {
+    private static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOOD_NBT_KEY = "tomte_mood";
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
 
+    public ItemStackHandler itemHandler = new ItemStackHandler(1);
     private int mood = 0;
 
     public BaseTomte(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
@@ -158,7 +163,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return Map.of(Activity.CORE,
             new BrainActivityGroup<BaseTomte>(Activity.CORE)
                 .behaviours(
-                        new SetWalkAndSimpleStealTarget<>(),
+                        new SetWalkAndSimpleStealTarget<>().cooldownFor(entity -> 30),
                         new SimpleStealingBehaviour<>()
                 ));
     }
@@ -167,12 +172,25 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt(MOOD_NBT_KEY, mood);
+        pCompound.put("inventory", this.itemHandler.serializeNBT());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.mood = pCompound.getInt(MOOD_NBT_KEY);
+        this.itemHandler.deserializeNBT(pCompound.getCompound("inventory"));
+    }
+
+    @Override
+    protected void dropEquipment() {
+        for (int slot = 0; slot < itemHandler.getSlots(); slot++){
+            ItemStack stack = itemHandler.getStackInSlot(slot);
+            if (!stack.isEmpty()){
+                spawnAtLocation(stack);
+                itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
+            }
+        }
     }
 
     public int getMood() {
@@ -194,4 +212,5 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public boolean isStealing(){
         return this.entityData.get(STEALING);
     }
+
 }

@@ -17,6 +17,7 @@ import net.tslat.smartbrainlib.registry.SBLMemoryTypes;
 import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
+import java.util.LinkedList;
 import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.BiPredicate;
@@ -33,6 +34,8 @@ public class SetWalkAndSimpleStealTarget<E extends LivingEntity> extends Extende
     protected BiFunction<E, Pair<BlockPos, BlockState>, Float> speedModFunction = (e, pair) -> 1f;
     protected BiFunction<E, Pair<BlockPos, BlockState>, Integer> closeEnoughFunction = (e, pair) -> 1;
 
+    private final LinkedList<BlockPos> searchedPosCache = new LinkedList<>();
+
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
         return MEMORY_REQUIREMENTS;
@@ -40,17 +43,18 @@ public class SetWalkAndSimpleStealTarget<E extends LivingEntity> extends Extende
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        LOGGER.debug("checkExtraStartConditions");
         var memory = BrainUtils.getMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
+        //noinspection DataFlowIssue
         if (memory.isEmpty()){
             BrainUtils.clearMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
             return false;
         } else {
             for (Pair<BlockPos, BlockState> pair : memory){
-                if (this.predicate.test(pair.getFirst(), pair.getSecond())){
+                if (this.predicate.test(pair.getFirst(), pair.getSecond()) && !this.searchedPosCache.contains(pair.getFirst())){
                     this.target = pair;
-                    memory.remove(this.target);
-                    BrainUtils.setMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get(), memory);
+                    addToCacheAndTrim(pair.getFirst());
+                    LOGGER.debug("checkExtraStartConditions {}", searchedPosCache.size());
+                    break;
                 }
             }
         }
@@ -78,5 +82,17 @@ public class SetWalkAndSimpleStealTarget<E extends LivingEntity> extends Extende
         BlockPosTracker posTracker = new BlockPosTracker(this.target.getFirst());
         BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(posTracker, this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
         BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, posTracker);
+    }
+
+    @Override
+    protected void stop(E entity) {
+        this.target = null;
+    }
+
+    private void addToCacheAndTrim(BlockPos pos){
+        if (this.searchedPosCache.size() >= 5){
+            this.searchedPosCache.removeFirst();
+        }
+        this.searchedPosCache.add(pos);
     }
 }
