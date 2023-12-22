@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "io.github.ageuxo.TomteMod.mixins",
+  "refmap": "mixins.tomtemod.refmap.json",
+  "compatibilityLevel": "JAVA_17",
+  "mixins": [
+
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "client": [
+
+  ]
+}
