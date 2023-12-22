@@ -1,6 +1,8 @@
 package io.github.ageuxo.TomteMod;
 
 import com.mojang.logging.LogUtils;
+import io.github.ageuxo.TomteMod.block.ModBlocks;
+import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -8,6 +10,7 @@ import io.github.ageuxo.TomteMod.entity.client.BaseTomteModel;
 import io.github.ageuxo.TomteMod.entity.client.BaseTomteRenderer;
 import io.github.ageuxo.TomteMod.entity.client.ModModelLayers;
 import io.github.ageuxo.TomteMod.entity.client.TomteModel;
+import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -26,6 +29,9 @@ public class TomteMod {
 
     public TomteMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        ModBlocks.register(modEventBus);
+        ModItems.register(modEventBus);
+        ModBlockEntities.register(modEventBus);
         ModEntities.register(modEventBus);
         ModMemoryTypes.register(modEventBus);
         ModSensors.register(modEventBus);
