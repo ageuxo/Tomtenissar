@@ -11,6 +11,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.client.model.data.ModelData;
+import org.joml.Quaternionf;
 
 public class SimplePresentBERenderer implements BlockEntityRenderer<SimplePresentBlockEntity> {
     public static ResourceLocation PRESENT_LID = TomteMod.modRL("block/present/simple_present_lid");
@@ -24,8 +25,14 @@ public class SimplePresentBERenderer implements BlockEntityRenderer<SimplePresen
 
     @Override
     public void render(SimplePresentBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight, int packedOverlay) {
-        float openness = blockEntity.getOpenness();
+        float openness = blockEntity.getOpenness(partialTick);
+        poseStack.pushPose();
+
+        poseStack.translate(-0.5D*openness, 0D, 0D);
+        poseStack.rotateAround(new Quaternionf(), 0.2f*openness, 0.4f*openness, 0f);
         this.modelBlockRenderer.renderModel(poseStack.last(), buffer.getBuffer(RenderType.cutout()),
                 null, this.lidModel, 0F, 0F, 0F, packedLight, packedOverlay, ModelData.EMPTY, RenderType.cutout());
+
+        poseStack.popPose();
     }
 }

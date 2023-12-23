@@ -1,43 +1,58 @@
 package io.github.ageuxo.TomteMod.gui;
 
 import com.mojang.logging.LogUtils;
-import io.github.ageuxo.TomteMod.block.entity.PresentBlockEntity;
 import io.github.ageuxo.TomteMod.block.entity.SimplePresentBlockEntity;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.ContainerLevelAccess;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.items.SlotItemHandler;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
 public class PresentMenu extends AbstractContainerMenu {
     Inventory inventory;
     Level level;
-    ContainerData data;
+    Player player;
     SimplePresentBlockEntity present;
 
     private static final Logger LOGGER = LogUtils.getLogger();
 
     public PresentMenu(int id, Inventory inventory, FriendlyByteBuf buf) {
-        this(id, inventory, (SimplePresentBlockEntity) inventory.player.level().getBlockEntity(buf.readBlockPos()), null);
+        this(id, inventory, (SimplePresentBlockEntity) inventory.player.level().getBlockEntity(buf.readBlockPos()));
     }
 
-    public PresentMenu(int id, Inventory inv, SimplePresentBlockEntity present, @Nullable ContainerData data){
+    public PresentMenu(int id, Inventory inv, SimplePresentBlockEntity present){
         super(ModMenuTypes.PRESENT.get(), id);
         this.TE_INVENTORY_SLOT_COUNT = 9;
         this.inventory = inv;
-        this.level = inventory.player.level();
-        this.data = data;
+        this.player = inv.player;
+        this.level = player.level();
         this.present = present;
 
         addPlayerInventory(inventory);
         addPlayerHotbar(inventory);
+        addContainerSlots(TE_INVENTORY_SLOT_COUNT, 44, -1);
+
+        present.startOpen(player);
+    }
+
+    protected void addContainerSlots(int count, int xOrig, int yOrig){
+        int x = xOrig;
+        int y = yOrig;
+        int k = 0;
+        for (int j = 0; j < count/3; j++) {
+            int slotOffset = 18;
+            y += slotOffset;
+            this.addSlot(new SlotItemHandler(present.getItemHandler(), j, x+=slotOffset, y));
+            this.addSlot(new SlotItemHandler(present.getItemHandler(), j, x+=slotOffset, y));
+            this.addSlot(new SlotItemHandler(present.getItemHandler(), j, x+=slotOffset, y));
+            x = xOrig;
+        }
     }
 
     protected void addPlayerInventory(Inventory playerInventory){
@@ -57,6 +72,16 @@ public class PresentMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(this.level, this.present.getBlockPos()), pPlayer, present.getBlockState().getBlock());
+    }
+
+    @Override
+    public void removed(Player pPlayer) {
+        super.removed(pPlayer);
+        this.present.stopOpen(pPlayer);
+    }
+
+    public float getOpenness(float partialTick){
+        return this.present.getOpenness(partialTick);
     }
 
     // CREDIT GOES TO: diesieben07 | https://github.com/diesieben07/SevenCommons

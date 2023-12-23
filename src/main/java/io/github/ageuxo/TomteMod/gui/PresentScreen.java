@@ -1,5 +1,6 @@
 package io.github.ageuxo.TomteMod.gui;
 
+import io.github.ageuxo.TomteMod.TomteMod;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -7,9 +8,11 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 
 public class PresentScreen extends AbstractContainerScreen<PresentMenu> {
+    public static final ResourceLocation PRESENT_GUI = TomteMod.modRL("textures/gui/present.png");
 
     public PresentScreen(PresentMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
+        this.imageHeight = 170;
     }
 
     @Override
@@ -26,6 +29,6 @@ public class PresentScreen extends AbstractContainerScreen<PresentMenu> {
 
     @Override
     protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
-        pGuiGraphics.blit(new ResourceLocation("textures/gui/container/dispenser.png"), this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
+        pGuiGraphics.blit(PRESENT_GUI, this.leftPos, this.topPos, 0, 0, this.imageWidth, this.imageHeight);
     }
 }
