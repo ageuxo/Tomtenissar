@@ -18,7 +18,7 @@ public class WrappingPaperItem extends Item {
         Level level = pContext.getLevel();
         BlockState state = level.getBlockState(pContext.getClickedPos());
         if (state.is(Blocks.CHEST)){
-            level.setBlockAndUpdate(pContext.getClickedPos(), ModBlocks.PRESENT.get().withPropertiesOf(state));
+            level.setBlockAndUpdate(pContext.getClickedPos(), ModBlocks.SIMPLE_PRESENT.get().withPropertiesOf(state));
             pContext.getItemInHand().shrink(1);
             return InteractionResult.sidedSuccess(level.isClientSide);
         }

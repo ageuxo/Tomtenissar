@@ -6,6 +6,6 @@ import net.minecraft.world.level.block.state.BlockState;
 
 public class PresentBlockEntity extends ChestBlockEntity {
     public PresentBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.PRESENT_TYPE.get(), pPos, pBlockState);
+        super(null, pPos, pBlockState);
     }
 }

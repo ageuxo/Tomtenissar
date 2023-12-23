@@ -1,0 +1,26 @@
+{
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"textures": {
+		"lid_side": "tomtemod:block/present/lid_side",
+		"lid_top": "tomtemod:block/present/lid_top",
+		"lid_bottom": "tomtemod:block/present/lid_bottom"
+	},
+	"elements": [
+		{
+			"name": "lid",
+			"from": [2.5, 6, 2.5],
+			"to": [13.5, 8, 13.5],
+			"color": 1,
+			"faces": {
+				"north": {"uv": [0, 0, 11, 2], "texture": "#lid_side"},
+				"east": {"uv": [0, 0, 11, 2], "texture": "#lid_side"},
+				"south": {"uv": [0, 0, 11, 2], "texture": "#lid_side"},
+				"west": {"uv": [0, 0, 11, 2], "texture": "#lid_side"},
+				"up": {"uv": [0, 0, 11, 11], "texture": "#lid_top"},
+				"down": {"uv": [0, 0, 11, 11], "texture": "#lid_bottom"}
+			}
+		}
+	],
+	"display": {}
+}

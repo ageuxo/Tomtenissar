@@ -1,0 +1,26 @@
+{
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"textures": {
+		"base_side": "tomtemod:block/present/base_side",
+		"base_top": "tomtemod:block/present/base_top",
+		"base_bottom": "tomtemod:block/present/base_bottom"
+	},
+	"elements": [
+		{
+			"name": "base",
+			"from": [3, 0, 3],
+			"to": [13, 7, 13],
+			"color": 9,
+			"faces": {
+				"north": {"uv": [0, 0, 10, 8], "texture": "#base_side"},
+				"east": {"uv": [0, 0, 10, 8], "texture": "#base_side"},
+				"south": {"uv": [0, 0, 10, 8], "texture": "#base_side"},
+				"west": {"uv": [0, 0, 10, 8], "texture": "#base_side"},
+				"up": {"uv": [0, 0, 16, 16], "texture": "#base_top"},
+				"down": {"uv": [0, 0, 16, 16], "texture": "#base_bottom"}
+			}
+		}
+	],
+	"display": {}
+}
