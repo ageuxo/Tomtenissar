@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.Block;
 
 public class ModTags {
 
-    public static final TagKey<Block> STEALABLE_CONTAINER = BlockTags.create(TomteMod.modRL("stealable_container"));
+    public static final TagKey<Block> TOMTE_NOTEWORTHY = BlockTags.create(TomteMod.modRL("tomte_noteworthy"));
 
     public static final TagKey<Item> STEALABLES = ItemTags.create(TomteMod.modRL("stealables"));
 }

@@ -1,8 +1,12 @@
 package io.github.ageuxo.TomteMod.entity;
 
 import com.mojang.logging.LogUtils;
+import io.github.ageuxo.TomteMod.ModTags;
+import io.github.ageuxo.TomteMod.entity.brain.behaviour.InteractWithDoorBehaviour;
+import io.github.ageuxo.TomteMod.entity.brain.behaviour.OpenDoorBehaviour;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.SetWalkAndSimpleStealTarget;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.SimpleStealingBehaviour;
+import io.github.ageuxo.TomteMod.entity.brain.sensor.DummyDoorSensor;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
@@ -10,16 +14,20 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.PathfinderMob;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.ai.behavior.Behavior;
+import net.minecraft.world.entity.ai.behavior.InteractWithDoor;
+import net.minecraft.world.entity.ai.navigation.GroundPathNavigation;
+import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.monster.Enemy;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.items.ItemStackHandler;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
@@ -46,7 +54,7 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Map;
 
-public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte> {
+public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte>, MoodyMob {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOOD_NBT_KEY = "tomte_mood";
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
@@ -118,14 +126,16 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                 new NearbyLivingEntitySensor<>(),
                 new HurtBySensor<>(),
                 new NearbyBlocksSensor<BaseTomte>()
-                        .setRadius(3)
-                        .setPredicate((state, entity) -> state.is(Blocks.CHEST))
+                        .setRadius(7)
+                        .setPredicate((state, entity) -> state.is(ModTags.TOMTE_NOTEWORTHY)),
+                new DummyDoorSensor<>()
         );
     }
 
     @Override
     public BrainActivityGroup<? extends BaseTomte> getCoreTasks() {
         return BrainActivityGroup.coreTasks(
+                new InteractWithDoorBehaviour(),
                 new LookAtTarget<>(),
                 new MoveToWalkTarget<>()
         );
@@ -169,6 +179,14 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
+    public PathNavigation getNavigation() {
+        PathNavigation navigation1 = super.getNavigation();
+        navigation1.getNodeEvaluator().setCanOpenDoors(true);
+        return navigation1;
+    }
+
+
+    @Override
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt(MOOD_NBT_KEY, mood);
@@ -193,8 +211,19 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         }
     }
 
+    @Override
     public int getMood() {
         return mood;
+    }
+
+    @Override
+    public void setMood(int mood) {
+        this.mood = mood;
+    }
+
+    @Override
+    public void addMood(int mood){
+        this.mood += mood;
     }
 
     public void setAttacking(boolean attacking){

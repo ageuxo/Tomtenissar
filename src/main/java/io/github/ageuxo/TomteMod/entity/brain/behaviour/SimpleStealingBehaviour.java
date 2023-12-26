@@ -28,11 +28,13 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     private static final Logger LOGGER = LogUtils.getLogger();
     protected BlockPos pos;
     protected int checkCooldown = 20;
+    protected int stealableMoodValue = 10;
     protected double minDistance = 1.73D;
     private long lastCheck;
 
     public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(
-            Pair.of(ModMemoryTypes.STEAL_TARGET.get(), MemoryStatus.VALUE_PRESENT)
+            Pair.of(ModMemoryTypes.STEAL_TARGET.get(), MemoryStatus.VALUE_PRESENT),
+            Pair.of(MemoryModuleType.PATH, MemoryStatus.REGISTERED)
     );
 
     public SimpleStealingBehaviour() {
@@ -76,7 +78,6 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
             boolean closeEnough = this.pos.closerToCenterThan(entity.position(), this.minDistance);
             if (!closeEnough){
                 BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.pos, 1f, 1));
-
             }
             return closeEnough;
         }
@@ -98,6 +99,10 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
         return this;
     }
 
+    public void setStealableMoodValue(int stealableMoodValue) {
+        this.stealableMoodValue = stealableMoodValue;
+    }
+
     @SuppressWarnings("DataFlowIssue")
     public void stealFromContainer(E entity, BlockPos pos){
         LazyOptional<IItemHandler> lazyOptional = entity.level().getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER);
@@ -115,7 +120,8 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
                         LOGGER.debug("Stealing {}", stolen);
                         stolen = itemHandler.extractItem(i, amount, false);
                         entity.itemHandler.insertItem(0, stolen, false);
-                        return;
+                        entity.addMood(stealableMoodValue);
+                        break;
                     }
                 }
             }

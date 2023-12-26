@@ -1,8 +1,11 @@
 package io.github.ageuxo.TomteMod.datagen;
 
+import io.github.ageuxo.TomteMod.ModTags;
 import io.github.ageuxo.TomteMod.TomteMod;
+import io.github.ageuxo.TomteMod.block.ModBlocks;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import org.jetbrains.annotations.Nullable;
@@ -17,6 +20,6 @@ public class ModBlockTagsProvider extends BlockTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.Provider pProvider) {
-//        this.tag(ModTags.STEALABLE_CONTAINER).add(Blocks.CHEST, Blocks.BARREL);
+        this.tag(ModTags.TOMTE_NOTEWORTHY).add(Blocks.CHEST, ModBlocks.SIMPLE_PRESENT.get());
     }
 }
