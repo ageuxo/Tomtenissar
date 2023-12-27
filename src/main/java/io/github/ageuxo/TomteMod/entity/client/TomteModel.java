@@ -66,6 +66,7 @@ public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> {
 		this.animate(entity.idleAnimationState, TomteAnimationDefinitions.IDLE_ANIM, ageInTicks, 1.0F);
 		this.animate(entity.stealAnimationState, TomteAnimationDefinitions.STEAL_ANIM, ageInTicks, 1.0F);
 		this.animate(entity.attackAnimationState, TomteAnimationDefinitions.ATTACK_ANIM, ageInTicks, 1.0F);
+		this.animate(entity.eatAnimationState, TomteAnimationDefinitions.EAT_ANIM, ageInTicks, 1.0F);
 	}
 
 	@Override

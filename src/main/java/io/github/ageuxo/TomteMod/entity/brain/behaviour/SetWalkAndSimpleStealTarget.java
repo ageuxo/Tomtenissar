@@ -30,9 +30,10 @@ public class SetWalkAndSimpleStealTarget<E extends Mob & MoodyMob> extends Exten
 
     protected static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(
             Pair.of(SBLMemoryTypes.NEARBY_BLOCKS.get(), MemoryStatus.VALUE_PRESENT),
-            Pair.of(ModMemoryTypes.STEAL_TARGET.get(), MemoryStatus.REGISTERED),
+            Pair.of(ModMemoryTypes.STEAL_TARGET.get(), MemoryStatus.VALUE_ABSENT),
             Pair.of(MemoryModuleType.WALK_TARGET, MemoryStatus.REGISTERED),
-            Pair.of(MemoryModuleType.PATH, MemoryStatus.REGISTERED)
+            Pair.of(MemoryModuleType.PATH, MemoryStatus.REGISTERED),
+            Pair.of(MemoryModuleType.IS_TEMPTED, MemoryStatus.VALUE_ABSENT)
     );
     protected Pair<BlockPos, BlockState> target;
     protected BiPredicate<BlockPos, BlockState> predicate = (blockPos, state) -> state.is(Blocks.CHEST);

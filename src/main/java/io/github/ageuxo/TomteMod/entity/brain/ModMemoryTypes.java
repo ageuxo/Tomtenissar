@@ -31,6 +31,8 @@ public class ModMemoryTypes {
 
     public static final RegistryObject<MemoryModuleType<Pair<BlockPos, BlockEntityType<?>>>> RUMMAGE_TARGET = MEMORY_TYPES.register("rummage_target", ()->new MemoryModuleType<>(Optional.of(Codec.pair(BlockPos.CODEC, BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec()))));
 
+    public static final RegistryObject<MemoryModuleType<Boolean>> HAS_FOOD = MEMORY_TYPES.register("has_food", ()->new MemoryModuleType<>(Optional.of(Codec.BOOL)));
+
     public static void register(IEventBus bus){
         MEMORY_TYPES.register(bus);
     }
