@@ -6,7 +6,6 @@ import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;

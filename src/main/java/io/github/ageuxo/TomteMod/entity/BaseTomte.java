@@ -214,10 +214,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         SmartBrainSchedule schedule = new SmartBrainSchedule();
         schedule.activityAt(2000, Activity.WORK);
         schedule.doAt(2000, BaseTomte::equalizeMood);
-        schedule.doAt(2000, (entity)-> {
-            BaseTomte tomte = (BaseTomte) entity;
-            tomte.itemHandler.setStackInSlot(0, ItemStack.EMPTY);
-        });
+        schedule.doAt(2000, this::clearInventory);
         schedule.activityAt(12000, Activity.REST);
         return schedule;
     }
@@ -387,7 +384,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return this.itemHandler.getStackInSlot(0);
     }
 
-    protected void clearInventory(){
+    protected void clearInventory(LivingEntity entity){
         this.itemHandler.setStackInSlot(0, ItemStack.EMPTY);
     }
 
