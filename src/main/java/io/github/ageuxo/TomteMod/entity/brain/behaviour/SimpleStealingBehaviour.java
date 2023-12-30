@@ -71,7 +71,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         if (level.getGameTime() - this.lastCheck < this.checkCooldown || level.getRandom().nextInt(2) != 1) {
             return false;
-        } else if (entity.getMood() < 10){ //TODO tweak this
+        } else if (entity.getMood() < 0){ //TODO tweak this
             LOGGER.debug("checkExtraStartConditions, mood:{}", entity.getMood());
             this.pos = BrainUtils.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
             this.lastCheck = level.getGameTime();

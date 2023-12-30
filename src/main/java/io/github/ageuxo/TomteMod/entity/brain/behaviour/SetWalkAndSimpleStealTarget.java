@@ -48,7 +48,7 @@ public class SetWalkAndSimpleStealTarget<E extends Mob & MoodyMob> extends Exten
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        if (entity.getMood() < 10){
+        if (entity.getMood() < 0){
             var memory = BrainUtils.getMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
             //noinspection DataFlowIssue
             if (memory.isEmpty()) {
