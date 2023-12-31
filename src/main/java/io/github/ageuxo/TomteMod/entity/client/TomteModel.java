@@ -7,17 +7,25 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.animation.TomteAnimationDefinitions;
+import net.minecraft.client.model.ArmedModel;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.world.entity.HumanoidArm;
+import org.joml.Vector3f;
 
-public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> {
+public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> implements ArmedModel {
 	private final ModelPart main;
+	private final ModelPart armLeft;
+	private final ModelPart armRight;
 
 
     public TomteModel(ModelPart root) {
 		this.main = root.getChild("main");
+		ModelPart arms = this.main.getChild("arms");
+		this.armLeft = arms.getChild("armLeft");
+		this.armRight = arms.getChild("armRight");
     }
 
 	public static LayerDefinition createBodyLayer() {
@@ -77,5 +85,20 @@ public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> {
 	@Override
 	public ModelPart root() {
 		return this.main;
+	}
+
+	@Override
+	public void translateToHand(HumanoidArm pSide, PoseStack pPoseStack) {
+		ModelPart arm;
+		if (pSide == HumanoidArm.LEFT){
+			arm = this.armLeft;
+		} else {
+			arm = this.armRight;
+		}
+//		arm.offsetPos(new Vector3f(0.0F, 0.8F, 0.0F));
+		pPoseStack.scale(0.6F, 0.6F, 0.6F);
+		pPoseStack.translate(-0.3F, 1.6F, 0.0F);
+		arm.translateAndRotate(pPoseStack);
+
 	}
 }

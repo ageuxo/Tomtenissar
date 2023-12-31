@@ -6,18 +6,21 @@ import io.github.ageuxo.TomteMod.ModTags;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.*;
 import io.github.ageuxo.TomteMod.entity.brain.sensor.DummyDoorSensor;
+import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.PathfinderMob;
+import net.minecraft.world.effect.MobEffects;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.Brain;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -25,6 +28,7 @@ import net.minecraft.world.entity.ai.behavior.SleepInBed;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.monster.Creeper;
 import net.minecraft.world.entity.monster.Enemy;
@@ -33,7 +37,12 @@ import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.gameevent.DynamicGameEventListener;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.EntityHandsInvWrapper;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
@@ -63,6 +72,7 @@ import org.slf4j.Logger;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte>, MoodyMob {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -71,12 +81,14 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
 
-    public ItemStackHandler itemHandler = new ItemStackHandler(1);
+    public IItemHandler itemHandler = new EntityHandsInvWrapper(this);
     private int mood = 0;
+    protected DynamicGameEventListener<CustomGameEventListener<BaseTomte>> animalDeathEventListener;
 
     public BaseTomte(EntityType<? extends PathfinderMob> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
         this.setCanPickUpLoot(true);
+        this.animalDeathEventListener = new DynamicGameEventListener<>(new CustomGameEventListener<>(this, GameEvent.ENTITY_DIE, (tomte) -> this.addMood(-2, true), BaseTomte::deathGameEventFilter, 16));
     }
 
     public final AnimationState idleAnimationState = new AnimationState();
@@ -153,7 +165,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return BrainActivityGroup.coreTasks(
                 new InteractWithDoorBehaviour(),
                 new LookAtTarget<>(),
-                new EatItemInInventory<>().runFor(tomte -> 23),
+                new EatItemInSlotBehaviour<>()
+                        .setAnimationCallback(this::setEating)
+                        .setFinishedCallback((entity, stack) -> this.onFoodEaten()),
                 new MoveToWalkTarget<>()
         );
     }
@@ -199,7 +213,6 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                 ),
                 Activity.REST, new BrainActivityGroup<BaseTomte>(Activity.REST)
                         .behaviours(
-                                // eat food, regain mood per hunger value?
                                 new FindAndValidatePoiBehaviour()
                                         .setPoiValidator(poiTypeHolder -> poiTypeHolder.is(PoiTypes.HOME))
                                         .setPoiPosMemory(MemoryModuleType.HOME),
@@ -214,9 +227,25 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         SmartBrainSchedule schedule = new SmartBrainSchedule();
         schedule.activityAt(2000, Activity.WORK);
         schedule.doAt(2000, BaseTomte::equalizeMood);
-        schedule.doAt(2000, this::clearInventory);
+        schedule.doAt(0, entity -> this.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY));
         schedule.activityAt(12000, Activity.REST);
         return schedule;
+    }
+
+    @Override
+    public boolean hurt(DamageSource pSource, float pAmount) {
+        Entity entity = pSource.getEntity();
+        if (entity instanceof Player){
+            this.addMood(-5, true);
+        }
+        return super.hurt(pSource, pAmount);
+    }
+
+    @Override
+    public void updateDynamicGameEventListener(BiConsumer<DynamicGameEventListener<?>, ServerLevel> pListenerConsumer) {
+        if (this.level() instanceof ServerLevel serverLevel){
+            pListenerConsumer.accept(this.animalDeathEventListener, serverLevel);
+        }
     }
 
     @Override
@@ -230,37 +259,27 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         pCompound.putInt(MOOD_NBT_KEY, mood);
-        pCompound.put("inventory", this.itemHandler.serializeNBT());
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         this.mood = pCompound.getInt(MOOD_NBT_KEY);
-        this.itemHandler.deserializeNBT(pCompound.getCompound("inventory"));
-    }
-
-    @Override
-    protected void dropEquipment() {
-        for (int slot = 0; slot < itemHandler.getSlots(); slot++){
-            ItemStack stack = itemHandler.getStackInSlot(slot);
-            if (!stack.isEmpty()){
-                spawnAtLocation(stack);
-                itemHandler.setStackInSlot(slot, ItemStack.EMPTY);
-            }
-        }
     }
 
     @Override
     public boolean wantsToPickUp(ItemStack pStack) {
-        return  (pStack.is(ModTags.STEALABLES) || wantsToEat(pStack) && canHoldItem(pStack));
+        return  ((pStack.is(ModTags.STEALABLES) || wantsToEat(pStack)) && canHoldItem(pStack));
     }
 
     @Override
     public boolean canHoldItem(ItemStack pStack) {
-        if (!pStack.isEmpty() && (pStack.is(ModTags.STEALABLES) || this.wantsToEat(pStack))){
-            ItemStack remainder = itemHandler.insertItem(0, pStack, true);
-            return remainder.isEmpty();
+        if (!pStack.isEmpty()){
+            ItemStack mainHandItem = this.getMainHandItem();
+            ItemStack offHandItem = this.getOffhandItem();
+            if (mainHandItem.isEmpty() || ItemHelpers.canStack(pStack, mainHandItem)){
+                return true;
+            } else return offHandItem.isEmpty() || ItemHelpers.canStack(pStack, offHandItem);
         }
         return false;
     }
@@ -268,24 +287,18 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     @Override
     protected void pickUpItem(ItemEntity pItemEntity) {
         ItemStack stack = pItemEntity.getItem();
-        ItemStack remainder = this.itemHandler.insertItem(0, stack.copy(), false);
-        int deltaCount = stack.getCount() - remainder.getCount();
-        if (remainder.getCount() < stack.getCount()){
+        if (stack.isEmpty()) return;
+        InteractionHand hand = this.wantsToEat(stack) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
+        int deltaCount = ItemHelpers.canStackHowMany(stack, this.getItemInHand(hand));
+        if (deltaCount > 0){
+            this.setItemInHand(hand, ItemHandlerHelper.copyStackWithSize(stack, deltaCount));
             this.onItemPickup(pItemEntity);
             this.take(pItemEntity, deltaCount);
             stack.shrink(deltaCount);
-            if (stack.isEmpty()){
-                pItemEntity.discard();
-            }
         }
-    }
-
-    @Override
-    public ItemStack getItemInHand(InteractionHand pHand) {
-        if (pHand == InteractionHand.MAIN_HAND){
-            return getHeldItem();
+        if (stack.isEmpty()){
+            pItemEntity.discard();
         }
-        return super.getItemInHand(pHand);
     }
 
     @Override
@@ -293,11 +306,11 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         super.onItemPickup(pItemEntity);
         ItemStack stack = pItemEntity.getItem();
         int mood = getMoodValueOfStack(stack);
-        if (stack.isEdible()){
+        if (this.wantsToEat(stack)){
             BrainUtils.setMemory(this, ModMemoryTypes.HAS_FOOD.get(), true);
         }
         LOGGER.debug("addMood: {}", mood);
-        this.addMood(mood);
+        this.addMood(mood, true);
     }
 
     public int getMoodValueOfStack(ItemStack stack) {
@@ -325,8 +338,37 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    public void addMood(int mood){
+    public void addMood(int mood, boolean visible){
         this.mood += mood;
+        Level level = this.level();
+        if (visible && !level.isClientSide){
+            byte eventId;
+            if (mood >= 0){
+                eventId = -68;
+            } else {
+                eventId = -69;
+            }
+            this.level().broadcastEntityEvent(this, eventId);
+        }
+    }
+
+    protected void addParticlesAroundSelf(ParticleOptions particleOptions) {
+        for(int i = 0; i < 5; ++i) {
+            double xSpeed = this.random.nextGaussian() * 0.02D;
+            double ySpeed = this.random.nextGaussian() * 0.02D;
+            double zSpeed = this.random.nextGaussian() * 0.02D;
+            this.level().addParticle(particleOptions, this.getRandomX(1.0D), this.getRandomY() + 1.0D, this.getRandomZ(1.0D), xSpeed, ySpeed, zSpeed);
+        }
+    }
+
+    @Override
+    public void handleEntityEvent(byte pId) {
+        switch (pId){
+            case -67 -> addParticlesAroundSelf(ParticleTypes.HEART);
+            case -68 -> addParticlesAroundSelf(ParticleTypes.HAPPY_VILLAGER);
+            case -69 -> addParticlesAroundSelf(ParticleTypes.ANGRY_VILLAGER);
+            default -> super.handleEntityEvent(pId);
+        }
     }
 
     public void setAttacking(boolean attacking){
@@ -374,18 +416,19 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     private static void equalizeMood(LivingEntity entity) {
         BaseTomte tomte = (BaseTomte) entity;
         if (tomte.getMood() > 15) {
-            tomte.addMood(-2);
+            tomte.addMood(-2, false);
         } else if (tomte.getMood() < -15) {
-            tomte.addMood(2);
+            tomte.addMood(2, false);
         }
     }
 
-    public ItemStack getHeldItem(){
-        return this.itemHandler.getStackInSlot(0);
+    public static boolean deathGameEventFilter(GameEvent.Context context){
+        return context.sourceEntity() instanceof Animal;
     }
 
-    protected void clearInventory(LivingEntity entity){
-        this.itemHandler.setStackInSlot(0, ItemStack.EMPTY);
+    public void onFoodEaten(){
+        this.addEffect(new MobEffectInstance(MobEffects.HEAL, 1));
+        this.level().broadcastEntityEvent(this, (byte) -67);
     }
 
 }

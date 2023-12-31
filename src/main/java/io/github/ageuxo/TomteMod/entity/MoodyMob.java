@@ -5,5 +5,5 @@ public interface MoodyMob {
 
     void setMood(int mood);
 
-    void addMood(int mood);
+    void addMood(int mood, boolean visible);
 }

@@ -113,14 +113,15 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
                 ItemStack stack = itemHandler.getStackInSlot(i);
                 if (stack.is(ModTags.STEALABLES)){
                     int amount = Math.min(4, stack.getCount());
+                    int slot = stack.isEdible() ? 0 : 1;
                     ItemStack stolen = itemHandler.extractItem(i, amount, true);
-                    int simInserted = entity.itemHandler.insertItem(0, stolen, true).getCount();
+                    int simInserted = entity.itemHandler.insertItem(slot, stolen, true).getCount();
                     int simStolen = stolen.getCount();
                     if (simInserted < simStolen){
                         LOGGER.debug("Stealing {}", stolen);
                         stolen = itemHandler.extractItem(i, amount, false);
-                        entity.itemHandler.insertItem(0, stolen, false);
-                        entity.addMood(stealableMoodValue);
+                        entity.itemHandler.insertItem(slot, stolen, false);
+                        entity.addMood(stealableMoodValue, true);
                         break;
                     }
                 }
