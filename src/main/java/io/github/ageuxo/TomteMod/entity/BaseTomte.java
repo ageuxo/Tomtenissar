@@ -77,6 +77,7 @@ import java.util.function.BiConsumer;
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte>, MoodyMob {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOOD_NBT_KEY = "tomte_mood";
+    public static final String ORIGIN_KEY = "tomte_origin";
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
@@ -177,7 +178,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour<>(
                         new TargetOrRetaliate<>().attackablePredicate(entity -> entity instanceof Enemy && !(entity instanceof Creeper)),
-                        new AvoidEntity<>().avoiding(livingEntity -> livingEntity instanceof Player).noCloserThan(4.0F),
+                        new AvoidEntity<>().avoiding(livingEntity -> livingEntity instanceof Player).noCloserThan(2.0F).stopCaringAfter(4.0F),
                         new SetPlayerLookTarget<>(),
                         new SetRandomLookTarget<>()
                 ),

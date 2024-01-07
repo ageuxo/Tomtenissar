@@ -11,7 +11,7 @@ import io.github.ageuxo.TomteMod.entity.client.BaseTomteRenderer;
 import io.github.ageuxo.TomteMod.entity.client.ModModelLayers;
 import io.github.ageuxo.TomteMod.entity.client.TomteModel;
 import io.github.ageuxo.TomteMod.gui.ModMenuTypes;
-import io.github.ageuxo.TomteMod.gui.PresentScreen;
+import io.github.ageuxo.TomteMod.gui.SimpleContainerScreen;
 import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -63,7 +63,8 @@ public class TomteMod {
             EntityRenderers.register(ModEntities.TOMTE.get(), BaseTomteRenderer::new);
 
             event.enqueueWork( ()-> {
-                MenuScreens.register(ModMenuTypes.PRESENT.get(), PresentScreen::new);
+                MenuScreens.register(ModMenuTypes.PRESENT.get(), SimpleContainerScreen::new);
+                MenuScreens.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
             });
         }
 

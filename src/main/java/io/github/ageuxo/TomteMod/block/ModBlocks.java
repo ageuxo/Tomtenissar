@@ -19,13 +19,19 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, TomteMod.MODID);
 
-//    public static final RegistryObject<Block> PRESENT = registerBlockWithItem("present", ()->new ChestBlock(BlockBehaviour.Properties.copy(Blocks.CHEST), ModBlockEntities.PRESENT_TYPE)); //TODO BlockItem
     public static final RegistryObject<Block> SIMPLE_PRESENT = registerBlockWithItem("simple_present", ()->new SimplePresentBlock(BlockBehaviour.Properties.of().mapColor(MapColor.COLOR_BLUE).instrument(NoteBlockInstrument.BASS).strength(2.5F).sound(SoundType.WOOD).noOcclusion()));
+    public static final RegistryObject<SimpleWorkStationBlock> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion());
+    public static final RegistryObject<SimpleWorkStationBlock> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion());
 
     protected static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> blockSupplier){
         RegistryObject<T> ret = BLOCKS.register(name, blockSupplier);
         registerBlockItem(name, ret);
         return ret;
+    }
+
+    protected static RegistryObject<SimpleWorkStationBlock> registerWorkStation(String name, BlockBehaviour.Properties properties){
+        String fullName = name + "_station";
+        return registerBlockWithItem(fullName, ()->new SimpleWorkStationBlock(name, properties));
     }
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block){

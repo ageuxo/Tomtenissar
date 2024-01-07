@@ -14,6 +14,7 @@ public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, TomteMod.MODID);
 
     public static final RegistryObject<MenuType<PresentMenu>> PRESENT = registerMenuType(PresentMenu::new, "present_menu");
+    public static final RegistryObject<MenuType<WorkStationMenu>> WORK_STATION = registerMenuType(WorkStationMenu::new, "work_station_menu");
 
     private static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> registerMenuType(IContainerFactory<T> factory, String name){
         return MENUS.register(name, () -> IForgeMenuType.create(factory));

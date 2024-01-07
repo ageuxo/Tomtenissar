@@ -4,26 +4,18 @@ import io.github.ageuxo.TomteMod.gui.PresentMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.Container;
-import net.minecraft.world.MenuProvider;
-import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.ChestLidController;
 import net.minecraft.world.level.block.entity.ContainerOpenersCounter;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
-public class SimplePresentBlockEntity extends BlockEntity implements MenuProvider, Nameable {
-    protected Component name;
-    protected ItemStackHandler itemHandler = new ItemStackHandler(9);
+public class SimplePresentBlockEntity extends SimpleContainerBlockEntity {
     protected final PresentOpenersCounter openersCounter = new PresentOpenersCounter(this);
     protected final ChestLidController lidController = new ChestLidController();
     protected float openness;
@@ -33,35 +25,14 @@ public class SimplePresentBlockEntity extends BlockEntity implements MenuProvide
     }
 
     @Override
-    public Component getName() {
-        return name != null ? this.name : this.getDefaultName();
-    }
-
-    private Component getDefaultName() {
+    protected Component getDefaultName() {
         return Component.translatable("tomtemod.gui.present.name");
-    }
-
-    @Override
-    public Component getDisplayName() {
-        return getName();
     }
 
     @Nullable
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         return new PresentMenu(pContainerId, pPlayerInventory, this);
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        super.saveAdditional(pTag);
-        pTag.put("inventory", itemHandler.serializeNBT());
-    }
-
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        itemHandler.deserializeNBT(pTag);
     }
 
     @Override
@@ -111,10 +82,6 @@ public class SimplePresentBlockEntity extends BlockEntity implements MenuProvide
 
     protected void signalOpenCount(Level level, BlockPos pos, BlockState state, int eventId, int eventParam){
         level.blockEvent(pos, state.getBlock(), eventId, eventParam);
-    }
-
-    public ItemStackHandler getItemHandler() {
-        return itemHandler;
     }
 
     @SuppressWarnings("DataFlowIssue")

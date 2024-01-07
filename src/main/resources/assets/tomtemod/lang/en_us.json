@@ -1,4 +1,7 @@
 {
   "tomtemod.gui.present.name": "Present",
+  "tomtemod.gui.workstation.default": "Work Station",
+  "tomtemod.gui.workstation.shearing": "Shearing Station",
+  "tomtemod.gui.workstation.milking": "Milking Station",
   "entity.tomtemod.tomte": "Tomte"
 }
