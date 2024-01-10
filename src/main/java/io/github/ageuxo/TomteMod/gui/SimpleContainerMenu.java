@@ -44,8 +44,6 @@ public abstract class SimpleContainerMenu<BE extends SimpleContainerBlockEntity>
         this.columns = columns;
         this.TE_INVENTORY_SLOT_COUNT = rows * columns;
 
-        this.blockEntity.getItemHandler().setSize(rows * columns);
-
         this.xOrig = ( (176/2) - (columns*SLOT_SIZE) / 2);
         this.yOrig = ( (176/4) - (rows*SLOT_SIZE) / 2);
 
