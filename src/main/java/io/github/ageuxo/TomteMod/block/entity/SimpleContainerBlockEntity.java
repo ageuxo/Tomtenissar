@@ -17,11 +17,20 @@ import org.jetbrains.annotations.Nullable;
 public abstract class SimpleContainerBlockEntity extends BlockEntity implements MenuProvider, Nameable {
     public static final String NAME_KEY = "CustomName";
     protected Component name;
-    protected ItemStackHandler itemHandler;
+    protected ItemStackHandler itemHandler = new ItemStackHandler(){
+        @Override
+        protected void onContentsChanged(int slot) {
+            SimpleContainerBlockEntity.this.setChanged();
+        }
+    };
+
+    public SimpleContainerBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState state, int rows, int columns) {
+        this(pType, pPos, state);
+        this.itemHandler.setSize(rows * columns);
+    }
 
     public SimpleContainerBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
         super(pType, pPos, pBlockState);
-        this.itemHandler = new ItemStackHandler();
     }
 
     @Override

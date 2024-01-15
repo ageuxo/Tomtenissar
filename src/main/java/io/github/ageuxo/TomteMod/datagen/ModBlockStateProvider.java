@@ -14,6 +14,10 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         simpleBlock(ModBlocks.SIMPLE_PRESENT.get(), models().getExistingFile(TomteMod.modRL("block/present/simple_present")));
+        horizontalBlock(ModBlocks.SHEARING_WORK_STATION.get(), models().getExistingFile(TomteMod.modRL("block/work_station")));
+        simpleBlockItem(ModBlocks.SHEARING_WORK_STATION.get(), models().getExistingFile(TomteMod.modRL("block/work_station")));
+        horizontalBlock(ModBlocks.MILKING_WORK_STATION.get(), models().getExistingFile(TomteMod.modRL("block/work_station")));
+        simpleBlockItem(ModBlocks.MILKING_WORK_STATION.get(), models().getExistingFile(TomteMod.modRL("block/work_station")));
     }
 
 

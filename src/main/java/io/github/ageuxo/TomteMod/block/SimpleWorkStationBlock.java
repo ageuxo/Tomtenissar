@@ -1,6 +1,6 @@
 package io.github.ageuxo.TomteMod.block;
 
-import io.github.ageuxo.TomteMod.block.entity.SimpleWorkStationBlockEntity;
+import io.github.ageuxo.TomteMod.block.entity.workstations.SimpleWorkStationBlockEntity;
 import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
@@ -18,16 +19,19 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
 public class SimpleWorkStationBlock extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
-    public final String name;
+    public static final VoxelShape SHAPE = Block.box(2.5, 0, 2.5, 12.5, 10, 12.5);
+    public final SimpleWorkStationBlockEntity.StationType type;
 
-    protected SimpleWorkStationBlock(String name, Properties pProperties) {
+    protected SimpleWorkStationBlock(Properties pProperties, SimpleWorkStationBlockEntity.StationType type) {
         super(pProperties);
-        this.name = name;
+        this.type = type;
     }
 
     @Override
@@ -38,7 +42,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new SimpleWorkStationBlockEntity(pPos, pState);
+        return new SimpleWorkStationBlockEntity(pPos, pState, this.type);
     }
 
     @Nullable
@@ -46,7 +50,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
         return new SimpleMenuProvider(
                 (pContainerId, pPlayerInventory, pPlayer) -> new WorkStationMenu(pContainerId, pPlayerInventory,
-                        (SimpleWorkStationBlockEntity) pLevel.getBlockEntity(pPos)), Component.translatable("tomtemod.gui.workstation." + this.name));
+                        (SimpleWorkStationBlockEntity) pLevel.getBlockEntity(pPos)), Component.translatable("tomtemod.gui.workstation." + this.type.name()));
     }
 
     @SuppressWarnings("deprecation")
@@ -66,6 +70,12 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
             }
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
+        return SHAPE;
     }
 
     @Override

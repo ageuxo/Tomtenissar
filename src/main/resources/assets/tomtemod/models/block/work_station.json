@@ -1,0 +1,24 @@
+{
+	"credit": "Made with Blockbench",
+	"parent": "minecraft:block/cube",
+	"textures": {
+		"bottom": "tomtemod:block/work_station_bottom",
+		"side": "tomtemod:block/work_station_side",
+		"top": "tomtemod:block/work_station_top",
+		"particle": "tomtemod:block/work_station_bottom"
+	},
+	"elements": [
+		{
+			"from": [2.5, 0, 2.5],
+			"to": [12.5, 10, 12.5],
+			"faces": {
+				"north": {"uv": [0, 0, 10, 10], "texture": "#side"},
+				"east": {"uv": [0, 0, 10, 10], "texture": "#side"},
+				"south": {"uv": [0, 0, 10, 10], "texture": "#side"},
+				"west": {"uv": [0, 0, 10, 10], "texture": "#side"},
+				"up": {"uv": [0, 0, 10, 10], "texture": "#top"},
+				"down": {"uv": [0, 0, 10, 10], "texture": "#bottom"}
+			}
+		}
+	]
+}
