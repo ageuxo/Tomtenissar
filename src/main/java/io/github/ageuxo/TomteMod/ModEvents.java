@@ -1,8 +1,7 @@
 package io.github.ageuxo.TomteMod;
 
 import io.github.ageuxo.TomteMod.datagen.ModBlockStateProvider;
-import io.github.ageuxo.TomteMod.datagen.ModBlockTagsProvider;
-import io.github.ageuxo.TomteMod.datagen.ModItemTagsProvider;
+import io.github.ageuxo.TomteMod.datagen.ModTagsProviders;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import net.minecraft.core.HolderLookup;
@@ -27,8 +26,7 @@ public class ModEvents {
         PackOutput packOutput = generator.getPackOutput();
         ExistingFileHelper fileHelper = event.getExistingFileHelper();
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
-        ModBlockTagsProvider blockTags = generator.addProvider(true, new ModBlockTagsProvider(packOutput, lookup, fileHelper));
-        generator.addProvider(true, new ModItemTagsProvider(packOutput, lookup, blockTags.contentsGetter(), fileHelper));
+        ModTagsProviders.addAll(generator, packOutput, lookup, fileHelper);
         generator.addProvider(true, new ModBlockStateProvider(packOutput, fileHelper));
     }
 }
