@@ -397,7 +397,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     public boolean shouldPickup(LivingEntity entity, ItemEntity item){
-        return item.getItem().is(ModTags.STEALABLES) || this.wantsToEat(item.getItem());
+        return (item.getItem().is(ModTags.STEALABLES) || this.wantsToEat(item.getItem())) && this.canHoldItem(item.getItem());
     }
 
     public boolean wantsToEat(ItemStack stack){
