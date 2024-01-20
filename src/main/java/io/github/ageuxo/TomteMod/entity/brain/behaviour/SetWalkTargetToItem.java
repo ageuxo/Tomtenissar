@@ -22,7 +22,7 @@ public class SetWalkTargetToItem<E extends Mob> extends ExtendedBehaviour<E> {
     public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = List.of(
             Pair.of(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM, MemoryStatus.VALUE_PRESENT),
             Pair.of(MemoryModuleType.WALK_TARGET, MemoryStatus.REGISTERED),
-            Pair.of(MemoryModuleType.IS_TEMPTED, MemoryStatus.REGISTERED)
+            Pair.of(MemoryModuleType.IS_TEMPTED, MemoryStatus.VALUE_ABSENT)
     );
 
     protected BiPredicate<E, ItemEntity> predicate = (e, itemEntity) -> true;
