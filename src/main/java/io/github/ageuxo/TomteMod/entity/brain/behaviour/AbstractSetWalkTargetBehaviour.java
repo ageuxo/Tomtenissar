@@ -22,6 +22,10 @@ public abstract class AbstractSetWalkTargetBehaviour<E extends Mob, T extends En
     protected MemoryModuleType<T> memoryType;
     protected T target = null;
 
+    public AbstractSetWalkTargetBehaviour(MemoryModuleType<T> memoryType){
+        this.memoryType = memoryType;
+    }
+
     public AbstractSetWalkTargetBehaviour<E, T> setPredicate(BiPredicate<E, T> predicate) {
         this.predicate = predicate;
         return this;
@@ -40,10 +44,15 @@ public abstract class AbstractSetWalkTargetBehaviour<E extends Mob, T extends En
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         T target = BrainUtils.getMemory(entity, this.memoryType);
+        if (target == null){
+            BrainUtils.clearMemory(entity, this.memoryType);
+            return false;
+        }
         if (this.predicate.test(entity, target)) {
             this.target = target;
+            return true;
         }
-        return this.target == target;
+        return false;
     }
 
     @Override

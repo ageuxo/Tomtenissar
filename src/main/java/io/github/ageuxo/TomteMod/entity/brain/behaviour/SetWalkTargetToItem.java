@@ -17,7 +17,7 @@ public class SetWalkTargetToItem<E extends Mob> extends AbstractSetWalkTargetBeh
     );
 
     public SetWalkTargetToItem(){
-        this.memoryType = MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM;
+        super(MemoryModuleType.NEAREST_VISIBLE_WANTED_ITEM);
     }
 
     @Override
