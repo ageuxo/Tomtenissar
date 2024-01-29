@@ -53,17 +53,17 @@ public abstract class SimpleContainerBlockEntity extends BlockEntity implements 
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
         pTag.put("inventory", itemHandler.serializeNBT());
-        if (pTag.contains(NAME_KEY)){
-            this.name = Component.Serializer.fromJson(pTag.getString(NAME_KEY));
+        if (this.name != null){
+            pTag.putString(NAME_KEY, Component.Serializer.toJson(this.name));
         }
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        itemHandler.deserializeNBT(pTag);
-        if (this.name != null){
-            pTag.putString(NAME_KEY, Component.Serializer.toJson(this.name));
+        itemHandler.deserializeNBT(pTag.getCompound("inventory"));
+        if (pTag.contains(NAME_KEY)){
+            this.name = Component.Serializer.fromJson(pTag.getString(NAME_KEY));
         }
     }
 

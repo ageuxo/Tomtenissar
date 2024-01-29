@@ -2,6 +2,7 @@ package io.github.ageuxo.TomteMod.block;
 
 import io.github.ageuxo.TomteMod.block.entity.workstations.SimpleWorkStationBlockEntity;
 import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
+import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -43,6 +44,17 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
         return new SimpleWorkStationBlockEntity(pPos, pState, this.type);
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
+        if (!pState.is(pNewState.getBlock())){
+            if (pLevel.getBlockEntity(pPos) instanceof SimpleWorkStationBlockEntity workStation){
+                ItemHelpers.dropHandlerItems(workStation, workStation.getItemHandler());
+                workStation.setRemoved();
+            }
+        }
     }
 
     @Nullable
