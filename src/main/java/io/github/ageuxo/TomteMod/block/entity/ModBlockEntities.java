@@ -3,7 +3,6 @@ package io.github.ageuxo.TomteMod.block.entity;
 import io.github.ageuxo.TomteMod.TomteMod;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.workstations.MilkingWorkStationBE;
-import io.github.ageuxo.TomteMod.block.entity.workstations.SimpleWorkStationBlockEntity;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;

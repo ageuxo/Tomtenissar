@@ -43,7 +43,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new SimpleWorkStationBlockEntity(pPos, pState, this.type);
+        return this.type.blockEntitySupplier.create(pPos, pState);
     }
 
     @SuppressWarnings("deprecation")
@@ -65,7 +65,6 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
                         (SimpleWorkStationBlockEntity) pLevel.getBlockEntity(pPos)), Component.translatable("tomtemod.gui.workstation." + this.type.name()));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;

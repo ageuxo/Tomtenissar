@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=east": {
+      "model": "tomtemod:block/work_station",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "tomtemod:block/work_station"
+    },
+    "facing=south": {
+      "model": "tomtemod:block/work_station",
+      "y": 180
+    },
+    "facing=west": {
+      "model": "tomtemod:block/work_station",
+      "y": 270
+    }
+  }
+}

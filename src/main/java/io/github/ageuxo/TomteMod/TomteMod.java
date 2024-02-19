@@ -19,6 +19,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.ModelEvent;
+import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -46,6 +47,8 @@ public class TomteMod {
         modEventBus.register(ModEvents.class);
 
         MinecraftForge.EVENT_BUS.register(ForgeEvents.class);
+
+        ForgeMod.enableMilkFluid();
     }
     public static ResourceLocation modRL(String path){
         return new ResourceLocation(MODID, path);

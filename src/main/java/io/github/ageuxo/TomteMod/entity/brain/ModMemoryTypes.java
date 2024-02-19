@@ -5,8 +5,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.UnboundedMapCodec;
 import io.github.ageuxo.TomteMod.TomteMod;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
+import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -32,6 +34,9 @@ public class ModMemoryTypes {
     public static final RegistryObject<MemoryModuleType<Pair<BlockPos, BlockEntityType<?>>>> RUMMAGE_TARGET = MEMORY_TYPES.register("rummage_target", ()->new MemoryModuleType<>(Optional.of(Codec.pair(BlockPos.CODEC, BuiltInRegistries.BLOCK_ENTITY_TYPE.byNameCodec()))));
 
     public static final RegistryObject<MemoryModuleType<Boolean>> HAS_FOOD = MEMORY_TYPES.register("has_food", ()->new MemoryModuleType<>(Optional.of(Codec.BOOL)));
+
+    public static final RegistryObject<MemoryModuleType<GlobalPos>> SHEARING_STATION = MEMORY_TYPES.register("shearing_station", ()->new MemoryModuleType<>(Optional.of(GlobalPos.CODEC)));
+    public static final RegistryObject<MemoryModuleType<GlobalPos>> MILKING_STATION = MEMORY_TYPES.register("milking_station", ()->new MemoryModuleType<>(Optional.of(GlobalPos.CODEC)));
 
     public static void register(IEventBus bus){
         MEMORY_TYPES.register(bus);

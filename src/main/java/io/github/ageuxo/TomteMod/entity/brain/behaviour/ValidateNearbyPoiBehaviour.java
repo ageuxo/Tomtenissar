@@ -14,15 +14,17 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.function.Supplier;
 
-public class FindAndValidatePoiBehaviour extends BuilderInstanceWrapperBehaviour<LivingEntity> {
-    public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = List.of(
-            Pair.of(MemoryModuleType.HOME, MemoryStatus.REGISTERED)
-    );
-    protected Predicate<Holder<PoiType>> poiValidator = poiTypeHolder -> true;
+public class ValidateNearbyPoiBehaviour extends BuilderInstanceWrapperBehaviour<LivingEntity> {
+    protected Predicate<Holder<PoiType>> poiFilter = poiTypeHolder -> true;
     protected MemoryModuleType<GlobalPos> poiPosMemory;
+    protected List<Pair<MemoryModuleType<?>, MemoryStatus>> memoryRequirements;
+    private static final List<Pair<MemoryModuleType<?>, MemoryStatus>> DEFAULT_REQUIREMENTS = List.of();
 
-    public FindAndValidatePoiBehaviour() {
-
+    public ValidateNearbyPoiBehaviour(MemoryModuleType<GlobalPos> memory) {
+        this.poiPosMemory = memory;
+        this.memoryRequirements = List.of(
+                Pair.of(memory, MemoryStatus.VALUE_PRESENT)
+        );
     }
 
     protected Supplier<BehaviorControl<LivingEntity>> makeInstanceSupplier(Predicate<Holder<PoiType>> poiValidator, MemoryModuleType<GlobalPos> poiPosMemory){
@@ -31,22 +33,16 @@ public class FindAndValidatePoiBehaviour extends BuilderInstanceWrapperBehaviour
 
     @Override
     protected void start(LivingEntity entity) {
-        setInstanceSupplier(makeInstanceSupplier(this.poiValidator, this.poiPosMemory));
-
+        setInstanceSupplier(makeInstanceSupplier(this.poiFilter, this.poiPosMemory));
     }
 
     @Override
     protected List<Pair<MemoryModuleType<?>, MemoryStatus>> getMemoryRequirements() {
-        return MEMORY_REQUIREMENTS;
+        return DEFAULT_REQUIREMENTS;
     }
 
-    public FindAndValidatePoiBehaviour setPoiValidator(Predicate<Holder<PoiType>> poiValidator) {
-        this.poiValidator = poiValidator;
-        return this;
-    }
-
-    public FindAndValidatePoiBehaviour setPoiPosMemory(MemoryModuleType<GlobalPos> poiPosMemory) {
-        this.poiPosMemory = poiPosMemory;
+    public ValidateNearbyPoiBehaviour setPoiFilter(Predicate<Holder<PoiType>> poiValidator) {
+        this.poiFilter = poiValidator;
         return this;
     }
 }

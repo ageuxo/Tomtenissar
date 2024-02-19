@@ -2,6 +2,7 @@ package io.github.ageuxo.TomteMod.entity;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
+import io.github.ageuxo.TomteMod.ModPoiTypes;
 import io.github.ageuxo.TomteMod.ModTags;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.behaviour.*;
@@ -39,13 +40,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.pathfinder.NodeEvaluator;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.EntityHandsInvWrapper;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
+import net.tslat.smartbrainlib.api.core.behaviour.AllApplicableBehaviours;
 import net.tslat.smartbrainlib.api.core.behaviour.FirstApplicableBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.OneRandomBehaviour;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.attack.AnimatableMeleeAttack;
@@ -90,6 +92,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         super(pEntityType, pLevel);
         this.setCanPickUpLoot(true);
         this.animalDeathEventListener = new DynamicGameEventListener<>(new CustomGameEventListener<>(this, GameEvent.ENTITY_DIE, (tomte) -> this.addMood(-2, true), BaseTomte::deathGameEventFilter, 16));
+        this.setMaxUpStep(1.5f);
     }
 
     public final AnimationState idleAnimationState = new AnimationState();
@@ -122,7 +125,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
 
     public static AttributeSupplier.Builder createAttributes(){
         return PathfinderMob.createLivingAttributes()
-                .add(Attributes.MAX_HEALTH, 10.0D)
+                .add(Attributes.MAX_HEALTH, 20.0D)
                 .add(Attributes.FOLLOW_RANGE, 6.0D)
                 .add(Attributes.MOVEMENT_SPEED, 0.3D)
                 .add(Attributes.ATTACK_DAMAGE, 3.0D)
@@ -169,16 +172,21 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                 new EatItemInSlotBehaviour<>()
                         .setAnimationCallback(this::setEating)
                         .setFinishedCallback((entity, stack) -> this.onFoodEaten()),
+                new StayCloseToHomeBehaviour<>(),
                 new MoveToWalkTarget<>()
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public BrainActivityGroup<? extends BaseTomte> getIdleTasks() {
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour<>(
-                        new TargetOrRetaliate<>().attackablePredicate(entity -> entity instanceof Enemy && !(entity instanceof Creeper)),
-                        new AvoidEntity<>().avoiding(livingEntity -> livingEntity instanceof Player).noCloserThan(2.0F).stopCaringAfter(4.0F),
+                        new TargetOrRetaliate<>()
+                                .attackablePredicate(entity -> entity instanceof Enemy && !(entity instanceof Creeper)),
+                        new AvoidEntity<>()
+                                .avoiding(livingEntity -> livingEntity instanceof Player).noCloserThan(2.0F)
+                                .stopCaringAfter(4.0F),
                         new SetPlayerLookTarget<>(),
                         new SetRandomLookTarget<>()
                 ),
@@ -192,7 +200,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public BrainActivityGroup<? extends BaseTomte> getFightTasks() {
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(),
-                new FleeTarget<>().startCondition(pathfinderMob -> pathfinderMob.getHealth() < pathfinderMob.getMaxHealth() / 3),
+                new FleeTarget<>()
+                        .speedModifier(1.2f)
+                        .startCondition(pathfinderMob -> pathfinderMob.getHealth() < pathfinderMob.getMaxHealth() / 3),
                 new SetWalkTargetToAttackTarget<>(),
                 new AnimatableMeleeAttack<BaseTomte>(5)
                         .attackInterval((tomte)->11)
@@ -200,35 +210,50 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         );
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public Map<Activity, BrainActivityGroup<? extends BaseTomte>> getAdditionalTasks() {
-        return Map.of(Activity.WORK,
-            new BrainActivityGroup<BaseTomte>(Activity.WORK)
+        return Map.of(
+                Activity.WORK, new BrainActivityGroup<BaseTomte>(Activity.WORK)
                 .behaviours(
+                        new AllApplicableBehaviours<>(
+                                new GetPoisBehaviour<>()
+                                        .setPoiFilter(type -> type.is(ModTags.WORK_STATIONS))
+                                        .add(ModPoiTypes.MILKING_STATION.getKey(), ModMemoryTypes.MILKING_STATION.get())
+                                        .cooldownFor(pathfinderMob -> 20)
+                        ),
                         new FirstApplicableBehaviour<>(
                                 new SetWalkTargetToItem<>().setPredicate(this::shouldPickup),
                                 new SetWalkAndSimpleStealTarget<>().cooldownFor(entity -> 30),
                                 new SimpleStealingBehaviour<>(),
-                                new SetRandomWalkTarget<>().cooldownFor(pathfinderMob -> pathfinderMob.getRandom().nextIntBetweenInclusive(30, 120))
+                                new FirstApplicableBehaviour<>(
+                                        new FindMilkableBehaviour<>(),
+                                        new SetWalkTargetToInteractTarget<>(),
+                                        new MilkCowBehaviour()
+                                                .cooldownFor(tomte -> 12)
+                                ).cooldownFor(tomte -> 20),
+                                new SetRandomWalkTarget<>()
+                                        .cooldownFor(pathfinderMob -> pathfinderMob.getRandom().nextIntBetweenInclusive(30, 120))
                         )
                 ),
                 Activity.REST, new BrainActivityGroup<BaseTomte>(Activity.REST)
                         .behaviours(
-                                new FindAndValidatePoiBehaviour()
-                                        .setPoiValidator(poiTypeHolder -> poiTypeHolder.is(PoiTypes.HOME))
-                                        .setPoiPosMemory(MemoryModuleType.HOME),
+                                new ValidateNearbyPoiBehaviour(MemoryModuleType.HOME)
+                                        .setPoiFilter(poiTypeHolder -> poiTypeHolder.is(PoiTypes.HOME))
+                                        .cooldownFor(entity -> entity.getRandom().nextInt(20, 120)),
                                 new SleepInBed(),
                                 new SetWalkToHomeBehaviour(),
                                 new RandomWalkInsideBehaviour()
-                ));
+                )
+        );
     }
 
     @Override
     public @Nullable SmartBrainSchedule getSchedule() {
         SmartBrainSchedule schedule = new SmartBrainSchedule();
+        schedule.doAt(0, entity -> this.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY));
         schedule.activityAt(2000, Activity.WORK);
         schedule.doAt(2000, BaseTomte::equalizeMood);
-        schedule.doAt(0, entity -> this.setItemInHand(InteractionHand.OFF_HAND, ItemStack.EMPTY));
         schedule.activityAt(12000, Activity.REST);
         return schedule;
     }
@@ -252,7 +277,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     @Override
     public PathNavigation getNavigation() {
         PathNavigation navigation1 = super.getNavigation();
-        navigation1.getNodeEvaluator().setCanOpenDoors(true);
+        NodeEvaluator evaluator = navigation1.getNodeEvaluator();
+        evaluator.setCanOpenDoors(true);
+        evaluator.setCanWalkOverFences(true);
         return navigation1;
     }
 
@@ -432,4 +459,8 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         this.level().broadcastEntityEvent(this, (byte) -67);
     }
 
+    @Override
+    protected float getJumpPower() {
+        return 0.50F * this.getBlockJumpFactor() + this.getJumpBoostPower();
+    }
 }

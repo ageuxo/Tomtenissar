@@ -3,5 +3,7 @@
   "tomtemod.gui.workstation.default": "Work Station",
   "tomtemod.gui.workstation.shearing": "Shearing Station",
   "tomtemod.gui.workstation.milking": "Milking Station",
-  "entity.tomtemod.tomte": "Tomte"
+  "entity.tomtemod.tomte": "Tomte",
+  "block.tomtemod.milking_station": "Milking workstation",
+  "block.tomtemod.shearing_station": "Shearing workstation"
 }
