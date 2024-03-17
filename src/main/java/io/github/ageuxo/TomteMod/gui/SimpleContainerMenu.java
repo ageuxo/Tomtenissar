@@ -27,7 +27,7 @@ public abstract class SimpleContainerMenu<BE extends SimpleContainerBlockEntity>
     protected Player player;
     protected final int rows;
     protected final int columns;
-    protected List<SlotItemHandler> containerSlots = new ArrayList<>();
+    protected List<Slot> extraSlots = new ArrayList<>();
     protected int xOrig;
     protected int yOrig;
     protected int inventoryXOffset;
@@ -57,6 +57,13 @@ public abstract class SimpleContainerMenu<BE extends SimpleContainerBlockEntity>
         addContainerSlots(rows, columns);
     }
 
+    protected void addExtraSlots(Slot... extraSlots){
+        for (Slot extraSlot : extraSlots) {
+            this.addSlot(extraSlot);
+            this.extraSlots.add(extraSlot);
+        }
+    }
+
     protected void addContainerSlots(int rows, int columns) {
         int slotIndex = 0;
         int x = this.xOrig;
@@ -65,7 +72,6 @@ public abstract class SimpleContainerMenu<BE extends SimpleContainerBlockEntity>
             for (int i = 0; i < columns; i++) {
                 SlotItemHandler slot = new SlotItemHandler(blockEntity.getItemHandler(), slotIndex++, x, y);
                 x += SLOT_SIZE;
-                containerSlots.add(slot);
                 this.addSlot(slot);
             }
             y += SLOT_SIZE;

@@ -1,15 +1,14 @@
 package io.github.ageuxo.TomteMod.block.entity.workstations;
 
-import io.github.ageuxo.TomteMod.item.ItemHandlerWrapper;
-import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
-import it.unimi.dsi.fastutil.ints.Int2LongMap;
-import it.unimi.dsi.fastutil.ints.IntArrayList;
+import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
+import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.entity.EntityTypeTest;
-import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -17,24 +16,15 @@ import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
 
-public class MilkingWorkStationBE extends SimpleWorkStationBlockEntity implements AnimalTypeWorkStation<Cow> {
-    protected Int2LongArrayMap idToCooldownMap = new Int2LongArrayMap();
-    protected List<Cow> cowCache;
-    protected ItemHandlerWrapper wrappedHandler;
-    private long lastCheck;
+public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     public MilkingWorkStationBE(BlockPos pPos, BlockState pBlockState) {
-        super(pPos, pBlockState, StationType.MILKING);
-        this.wrappedHandler = new ItemHandlerWrapper(this.itemHandler){
-            @Override
-            public int getSlotLimit(int slot) {
-                return 1;
-            }
-        };
+        super(ModBlockEntities.MILKING_STATION.get(), pPos, pBlockState, StationType.MILKING);
         this.wrappedHandler.setInsertFilter((integer, stack) -> stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().isPresent());
     }
 
@@ -44,11 +34,16 @@ public class MilkingWorkStationBE extends SimpleWorkStationBlockEntity implement
     }
 
     @Override
+    public @Nullable AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
+        return new WorkStationMenu(pContainerId, pPlayerInventory, (SimpleWorkStationBlockEntity) this.level.getBlockEntity(this.worldPosition));
+    }
+
+    @Override
     public boolean canBeWorkedAt() {
         return hasValidContainer();
     }
 
-    public void doMilking(Cow cow){
+    public void doAction(Cow cow){
         if (!this.level.isClientSide){
             int size = this.itemHandler.getSlots();
             FluidStack stack = new FluidStack(ForgeMod.MILK.get(), 1000);
@@ -69,7 +64,7 @@ public class MilkingWorkStationBE extends SimpleWorkStationBlockEntity implement
     @Override
     public List<Cow> getWorkableAnimals() {
         this.trimIdMap();
-        return this.getOrFindCows();
+        return this.getOrFindAnimals(Cow.class);
     }
 
     protected boolean hasValidContainer() {
@@ -80,39 +75,6 @@ public class MilkingWorkStationBE extends SimpleWorkStationBlockEntity implement
             }
         }
         return false;
-    }
-
-    @SuppressWarnings("DataFlowIssue")
-    protected List<Cow> getOrFindCows(){
-        List<Cow> foundCows;
-        if (this.cowCache == null || this.level.getGameTime() - this.lastCheck  < 100){
-            AABB checkBox = new AABB(this.worldPosition);
-            checkBox = checkBox.inflate(8);
-            foundCows = this.level.getEntities(EntityTypeTest.forClass(Cow.class), checkBox, this.type.predicate);
-            this.lastCheck = this.level.getGameTime();
-        } else {
-            foundCows = this.cowCache;
-        }
-        foundCows.removeIf(this::filterByCooldown);
-        this.cowCache = foundCows;
-        return foundCows;
-    }
-
-    protected void trimIdMap(){
-        IntArrayList ids = new IntArrayList();
-        for (Int2LongMap.Entry entry : this.idToCooldownMap.int2LongEntrySet()){
-            //noinspection DataFlowIssue
-            if (entry.getLongValue() - this.level.getGameTime() >= 10000){
-                ids.add(entry.getIntKey());
-            }
-        }
-        for (int id : ids){
-            this.idToCooldownMap.remove(id);
-        }
-    }
-
-    private boolean filterByCooldown(Cow cow) {
-        return this.idToCooldownMap.containsKey(cow.getId());
     }
 
     protected boolean fluidFitsInSlot(IItemHandler itemHandler, int slot, FluidStack fluidStack){

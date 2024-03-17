@@ -45,7 +45,6 @@ public class SimplePresentBlock extends BaseEntityBlock {
                         (SimplePresentBlockEntity) pLevel.getBlockEntity(pPos)), Component.translatable("tomtemod.gui.present.name"));
     }
 
-    @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
@@ -70,6 +69,7 @@ public class SimplePresentBlock extends BaseEntityBlock {
         return pLevel.isClientSide ? createTickerHelper(pBlockEntityType, ModBlockEntities.SIMPLE_PRESENT.get(), SimplePresentBlockEntity::lidAnimateTick) : null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);

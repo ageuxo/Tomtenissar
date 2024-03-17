@@ -1,15 +1,13 @@
 package io.github.ageuxo.TomteMod.block;
 
 import io.github.ageuxo.TomteMod.block.entity.workstations.SimpleWorkStationBlockEntity;
-import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
+import io.github.ageuxo.TomteMod.gui.NameableBEMenuProvider;
 import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
-import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -60,9 +58,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
-        return new SimpleMenuProvider(
-                (pContainerId, pPlayerInventory, pPlayer) -> new WorkStationMenu(pContainerId, pPlayerInventory,
-                        (SimpleWorkStationBlockEntity) pLevel.getBlockEntity(pPos)), Component.translatable("tomtemod.gui.workstation." + this.type.name()));
+        return new NameableBEMenuProvider(pLevel, pPos, this.type.menu);
     }
 
     @Override
@@ -77,7 +73,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
             return InteractionResult.SUCCESS;
         } else {
             if (pLevel.getBlockEntity(pPos) instanceof SimpleWorkStationBlockEntity workStation){
-                NetworkHooks.openScreen((ServerPlayer) pPlayer, workStation, pPos);
+                NetworkHooks.openScreen((ServerPlayer) pPlayer, workStation, byteBuf -> byteBuf.writeBlockPos(pPos));
             }
         }
         return InteractionResult.SUCCESS;

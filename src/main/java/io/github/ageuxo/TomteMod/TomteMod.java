@@ -68,12 +68,12 @@ public class TomteMod {
             event.enqueueWork( ()-> {
                 MenuScreens.register(ModMenuTypes.PRESENT.get(), SimpleContainerScreen::new);
                 MenuScreens.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
+                MenuScreens.register(ModMenuTypes.SHEARING_STATION.get(), SimpleContainerScreen::new);
             });
         }
 
         @SubscribeEvent
         public static void registerRenderer(EntityRenderersEvent.RegisterRenderers event){
-//            event.registerBlockEntityRenderer(ModBlockEntities.PRESENT_TYPE.get(), context -> new PresentBERenderer(context));
             event.registerBlockEntityRenderer(ModBlockEntities.SIMPLE_PRESENT.get(), SimplePresentBERenderer::new);
         }
 
