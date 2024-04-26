@@ -1,10 +1,11 @@
 package io.github.ageuxo.TomteMod.block.entity.workstations;
 
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
-import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
+import io.github.ageuxo.TomteMod.gui.MilkingWorkStationMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.Cow;
+import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -24,7 +25,7 @@ import java.util.Optional;
 public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     public MilkingWorkStationBE(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.MILKING_STATION.get(), pPos, pBlockState, StationType.MILKING);
+        super(ModBlockEntities.MILKING_STATION.get(), pPos, pBlockState, (animal -> animal instanceof Cow && !(animal instanceof MushroomCow)), 3, 5, 0);
         this.wrappedHandler.setInsertFilter((integer, stack) -> stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().isPresent());
     }
 
@@ -35,7 +36,7 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     @Override
     public @Nullable AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
-        return new WorkStationMenu(pContainerId, pPlayerInventory, (SimpleWorkStationBlockEntity) this.level.getBlockEntity(this.worldPosition));
+        return new MilkingWorkStationMenu(pContainerId, pPlayerInventory, (MilkingWorkStationBE) this.level.getBlockEntity(this.worldPosition));
     }
 
     @Override

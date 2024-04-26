@@ -1,5 +1,6 @@
 package io.github.ageuxo.TomteMod.block.entity.workstations;
 
+import io.github.ageuxo.TomteMod.block.entity.SimpleContainerBlockEntity;
 import io.github.ageuxo.TomteMod.item.ItemHandlerWrapper;
 import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2LongMap;
@@ -13,17 +14,19 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.List;
+import java.util.function.Predicate;
 
-public abstract class AbstractAnimalWorkStation<A extends Animal> extends SimpleWorkStationBlockEntity {
+public abstract class AbstractAnimalWorkStation<A extends Animal> extends SimpleContainerBlockEntity {
 
     protected Int2LongArrayMap idToCooldownMap = new Int2LongArrayMap();
     protected List<A> animalCache;
     protected ItemHandlerWrapper wrappedHandler;
     protected long lastCheck;
+    protected Predicate<? super A> predicate;
 
-    public AbstractAnimalWorkStation(BlockEntityType<?> blockEntityType, BlockPos pPos, BlockState pBlockState, StationType type) {
-        super(blockEntityType, pPos, pBlockState, type);
-        this.wrappedHandler = new ItemHandlerWrapper(this.itemHandler);
+    public AbstractAnimalWorkStation(BlockEntityType<?> blockEntityType, BlockPos pPos, BlockState pBlockState, Predicate<? super A> predicate, int rows, int columns, int extraSlots) {
+        super(blockEntityType, pPos, pBlockState, rows, columns, extraSlots);
+        this.predicate = predicate;
     }
 
     public abstract void doAction(A animal);
@@ -47,7 +50,7 @@ public abstract class AbstractAnimalWorkStation<A extends Animal> extends Simple
         if (this.animalCache == null || this.level.getGameTime() - this.lastCheck  < 100){
             AABB checkBox = new AABB(this.worldPosition);
             checkBox = checkBox.inflate(8);
-            foundAnimals = this.level.getEntities(EntityTypeTest.forClass(aClass), checkBox, this.type.predicate);
+            foundAnimals = this.level.getEntities(EntityTypeTest.forClass(aClass), checkBox, predicate);
             this.lastCheck = this.level.getGameTime();
         } else {
             foundAnimals = this.animalCache;

@@ -47,7 +47,7 @@ public class ModTagsProviders{
 
         @Override
         protected void addTags(HolderLookup.Provider pProvider) {
-            this.tag(ModTags.TOMTE_NOTEWORTHY).add(Blocks.CHEST, ModBlocks.SIMPLE_PRESENT.get());
+
         }
     }
 

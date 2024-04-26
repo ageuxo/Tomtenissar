@@ -13,8 +13,6 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, TomteMod.MODID);
 
-    public static final RegistryObject<BlockEntityType<SimplePresentBlockEntity>> SIMPLE_PRESENT = BLOCK_ENTITIES.register("simple_present_be",
-            ()-> BlockEntityType.Builder.of(SimplePresentBlockEntity::new, ModBlocks.SIMPLE_PRESENT.get()).build(null));
     public static final RegistryObject<BlockEntityType<MilkingWorkStationBE>> MILKING_STATION = BLOCK_ENTITIES.register("milking_station_be",
             ()-> BlockEntityType.Builder.of(MilkingWorkStationBE::new, ModBlocks.MILKING_WORK_STATION.get()).build(null));
     public static final RegistryObject<BlockEntityType<ShearingWorkStationBE>> SHEARING_STATION = BLOCK_ENTITIES.register("shearing_station_be",

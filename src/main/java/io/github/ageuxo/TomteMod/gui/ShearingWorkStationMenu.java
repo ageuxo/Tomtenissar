@@ -8,7 +8,7 @@ import net.minecraftforge.items.SlotItemHandler;
 public class ShearingWorkStationMenu extends SimpleContainerMenu<ShearingWorkStationBE>{
 
     public ShearingWorkStationMenu(int pContainerId, Inventory inv, ShearingWorkStationBE blockEntity) {
-        super(ModMenuTypes.SHEARING_STATION.get(), pContainerId, inv, blockEntity, blockEntity.type.rows, blockEntity.type.columns);
+        super(ModMenuTypes.SHEARING_STATION.get(), pContainerId, inv, blockEntity, 3, 5);
         addExtraSlots(
                 new SlotItemHandler(this.blockEntity.getItemHandler(), ShearingWorkStationBE.SHEARS_SLOT, xOrig - SimpleContainerMenu.SLOT_SIZE*2, yOrig + 18)
         );

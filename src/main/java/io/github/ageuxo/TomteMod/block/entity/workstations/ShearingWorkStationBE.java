@@ -3,7 +3,6 @@ package io.github.ageuxo.TomteMod.block.entity.workstations;
 import com.mojang.authlib.GameProfile;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.gui.ShearingWorkStationMenu;
-import io.github.ageuxo.TomteMod.gui.WorkStationMenu;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -18,7 +17,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,7 +28,7 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
     protected FakePlayer fakePlayer;
 
     public ShearingWorkStationBE(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.SHEARING_STATION.get(), pPos, pBlockState, StationType.SHEARING);
+        super(ModBlockEntities.SHEARING_STATION.get(), pPos, pBlockState, Sheep::readyForShearing, 3, 5, 1, this.wrappedHandler);
         this.wrappedHandler.setInsertFilter((slot, stack) -> {
             if (slot == SHEARS_SLOT){
                 return stack.getItem() instanceof ShearsItem;

@@ -1,6 +1,7 @@
 package io.github.ageuxo.TomteMod.block;
 
-import io.github.ageuxo.TomteMod.block.entity.workstations.SimpleWorkStationBlockEntity;
+import io.github.ageuxo.TomteMod.block.entity.workstations.AbstractAnimalWorkStation;
+import io.github.ageuxo.TomteMod.gui.BlockEntityMenuConstructor;
 import io.github.ageuxo.TomteMod.gui.NameableBEMenuProvider;
 import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import net.minecraft.core.BlockPos;
@@ -14,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
@@ -23,14 +25,15 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.network.NetworkHooks;
 import org.jetbrains.annotations.Nullable;
 
-public class SimpleWorkStationBlock extends BaseEntityBlock {
+public class SimpleWorkStationBlock<S extends AbstractAnimalWorkStation<?>> extends BaseEntityBlock {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final VoxelShape SHAPE = Block.box(2.5, 0, 2.5, 12.5, 10, 12.5);
-    public final SimpleWorkStationBlockEntity.StationType type;
+    public BlockEntityMenuConstructor<S> menuConstructor;
+    public BlockEntityType.BlockEntitySupplier<S> blockEntitySupplier;
 
-    protected SimpleWorkStationBlock(Properties pProperties, SimpleWorkStationBlockEntity.StationType type) {
+    protected SimpleWorkStationBlock(Properties pProperties, BlockEntityMenuConstructor<S> menuConstructor) {
         super(pProperties);
-        this.type = type;
+        this.menuConstructor = menuConstructor;
     }
 
     @Override
@@ -41,14 +44,14 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return this.type.blockEntitySupplier.create(pPos, pState);
+        return blockEntitySupplier.create(pPos, pState);
     }
 
     @SuppressWarnings("deprecation")
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
         if (!pState.is(pNewState.getBlock())){
-            if (pLevel.getBlockEntity(pPos) instanceof SimpleWorkStationBlockEntity workStation){
+            if (pLevel.getBlockEntity(pPos) instanceof AbstractAnimalWorkStation<?> workStation){
                 ItemHelpers.dropHandlerItems(workStation, workStation.getItemHandler());
                 workStation.setRemoved();
             }
@@ -58,9 +61,10 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
-        return new NameableBEMenuProvider<>(pLevel, pPos, this.type.menu);
+        return new NameableBEMenuProvider<>(pLevel, pPos, menuConstructor);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
@@ -72,7 +76,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
         if (pLevel.isClientSide){
             return InteractionResult.SUCCESS;
         } else {
-            if (pLevel.getBlockEntity(pPos) instanceof SimpleWorkStationBlockEntity workStation){
+            if (pLevel.getBlockEntity(pPos) instanceof AbstractAnimalWorkStation<?> workStation){
                 NetworkHooks.openScreen((ServerPlayer) pPlayer, workStation, byteBuf -> byteBuf.writeBlockPos(pPos));
             }
         }
