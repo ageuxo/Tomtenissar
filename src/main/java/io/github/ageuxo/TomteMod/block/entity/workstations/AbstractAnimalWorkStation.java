@@ -10,12 +10,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.List;
 
-public abstract class AbstractAnimalWorkStation<A extends Animal> extends SimpleWorkStationBlockEntity implements AnimalTypeWorkStation<A>{
+public abstract class AbstractAnimalWorkStation<A extends Animal> extends SimpleWorkStationBlockEntity {
 
     protected Int2LongArrayMap idToCooldownMap = new Int2LongArrayMap();
     protected List<A> animalCache;
@@ -67,9 +66,7 @@ public abstract class AbstractAnimalWorkStation<A extends Animal> extends Simple
         return this.wrappedHandler;
     }
 
-    @Override
     public abstract List<A> getWorkableAnimals();
 
-    @Override
     public abstract boolean canBeWorkedAt();
 }

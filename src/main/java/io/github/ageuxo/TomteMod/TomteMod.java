@@ -3,7 +3,6 @@ package io.github.ageuxo.TomteMod;
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
-import io.github.ageuxo.TomteMod.block.entity.render.SimplePresentBERenderer;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -67,21 +66,9 @@ public class TomteMod {
             EntityRenderers.register(ModEntities.TOMTE.get(), BaseTomteRenderer::new);
 
             event.enqueueWork( ()-> {
-                MenuScreens.register(ModMenuTypes.PRESENT.get(), SimpleContainerScreen::new);
                 MenuScreens.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
                 MenuScreens.register(ModMenuTypes.SHEARING_STATION.get(), ShearingStationScreen::new);
             });
         }
-
-        @SubscribeEvent
-        public static void registerRenderer(EntityRenderersEvent.RegisterRenderers event){
-            event.registerBlockEntityRenderer(ModBlockEntities.SIMPLE_PRESENT.get(), SimplePresentBERenderer::new);
-        }
-
-        @SubscribeEvent
-        public static void registerAdditionalModels(ModelEvent.RegisterAdditional event){
-            event.register(SimplePresentBERenderer.PRESENT_LID);
-        }
-
     }
 }
