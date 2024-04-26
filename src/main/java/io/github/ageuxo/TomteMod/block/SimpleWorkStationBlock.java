@@ -58,7 +58,7 @@ public class SimpleWorkStationBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
-        return new NameableBEMenuProvider(pLevel, pPos, this.type.menu);
+        return new NameableBEMenuProvider<>(pLevel, pPos, this.type.menu);
     }
 
     @Override

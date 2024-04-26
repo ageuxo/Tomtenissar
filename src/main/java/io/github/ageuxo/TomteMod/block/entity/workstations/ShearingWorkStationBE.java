@@ -31,7 +31,6 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
 
     public ShearingWorkStationBE(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.SHEARING_STATION.get(), pPos, pBlockState, StationType.SHEARING);
-        this.itemHandler = new ItemStackHandler(16);
         this.wrappedHandler.setInsertFilter((slot, stack) -> {
             if (slot == SHEARS_SLOT){
                 return stack.getItem() instanceof ShearsItem;

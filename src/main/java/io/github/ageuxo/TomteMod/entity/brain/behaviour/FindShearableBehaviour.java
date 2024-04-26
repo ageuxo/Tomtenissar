@@ -21,7 +21,7 @@ import java.util.List;
 public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBehaviour<E> {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = List.of(
-            Pair.of(ModMemoryTypes.MILKING_STATION.get(), MemoryStatus.VALUE_PRESENT),
+            Pair.of(ModMemoryTypes.SHEARING_STATION.get(), MemoryStatus.VALUE_PRESENT),
             Pair.of(MemoryModuleType.INTERACTION_TARGET, MemoryStatus.VALUE_ABSENT)
     );
     protected ShearingWorkStationBE shearingStation;

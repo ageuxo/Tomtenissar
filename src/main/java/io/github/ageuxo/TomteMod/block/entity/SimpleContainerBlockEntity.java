@@ -11,6 +11,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,9 +26,9 @@ public abstract class SimpleContainerBlockEntity extends BlockEntity implements 
         }
     };
 
-    public SimpleContainerBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState state, int rows, int columns) {
+    public SimpleContainerBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState state, int rows, int columns, int extraSlots) {
         this(pType, pPos, state);
-        this.itemHandler.setSize(rows * columns);
+        this.itemHandler.setSize((rows * columns) + extraSlots);
     }
 
     public SimpleContainerBlockEntity(BlockEntityType<?> pType, BlockPos pPos, BlockState pBlockState) {
@@ -67,7 +69,7 @@ public abstract class SimpleContainerBlockEntity extends BlockEntity implements 
         }
     }
 
-    public ItemStackHandler getItemHandler() {
+    public IItemHandlerModifiable getItemHandler() {
         return itemHandler;
     }
 }

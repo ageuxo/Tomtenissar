@@ -50,10 +50,9 @@ public class SimpleContainerScreen extends AbstractContainerScreen<SimpleContain
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
         this.renderBackground(pGuiGraphics);
-        this.renderExtraSlots(pGuiGraphics);
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         this.renderTooltip(pGuiGraphics, pMouseX, pMouseY);
-        pGuiGraphics.drawCenteredString(minecraft.font, pMouseX+","+pMouseY, pMouseX, pMouseY, 0xFFFFFF);
+//        pGuiGraphics.drawCenteredString(minecraft.font, pMouseX+","+pMouseY, pMouseX, pMouseY, 0xFFFFFF);
     }
 
     @Override
@@ -64,12 +63,17 @@ public class SimpleContainerScreen extends AbstractContainerScreen<SimpleContain
         }
         renderContainerSlots(pGuiGraphics);
         renderInventorySlots(pGuiGraphics);
+        renderExtraSlots(pGuiGraphics);
     }
 
     public void renderExtraSlots(GuiGraphics guiGraphics){
         for (Slot slot : this.menu.extraSlots){
-            guiGraphics.blit(SLOT_TEXTURE, slot.x + this.leftPos, slot.y + this.topPos, 0, 0, SimpleContainerMenu.SLOT_SIZE, SimpleContainerMenu.SLOT_SIZE);
+            renderExtraSlot(guiGraphics, slot);
         }
+    }
+
+    public void renderExtraSlot(GuiGraphics guiGraphics, Slot slot) {
+        guiGraphics.blit(SLOT_TEXTURE, slot.x + this.leftPos - 1, slot.y + this.topPos - 1, 0, 0, SimpleContainerMenu.SLOT_SIZE, SimpleContainerMenu.SLOT_SIZE, SimpleContainerMenu.SLOT_SIZE, SimpleContainerMenu.SLOT_SIZE);
     }
 
     public void renderContainerSlots(GuiGraphics guiGraphics){

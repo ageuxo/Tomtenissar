@@ -10,7 +10,7 @@ public class ShearingWorkStationMenu extends SimpleContainerMenu<ShearingWorkSta
     public ShearingWorkStationMenu(int pContainerId, Inventory inv, ShearingWorkStationBE blockEntity) {
         super(ModMenuTypes.SHEARING_STATION.get(), pContainerId, inv, blockEntity, blockEntity.type.rows, blockEntity.type.columns);
         addExtraSlots(
-                new SlotItemHandler(this.blockEntity.getItemHandler(), ShearingWorkStationBE.SHEARS_SLOT, 0, 0)
+                new SlotItemHandler(this.blockEntity.getItemHandler(), ShearingWorkStationBE.SHEARS_SLOT, xOrig - SimpleContainerMenu.SLOT_SIZE*2, yOrig + 18)
         );
     }
 

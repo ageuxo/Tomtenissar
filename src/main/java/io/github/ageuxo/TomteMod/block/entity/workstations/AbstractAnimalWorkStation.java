@@ -5,12 +5,13 @@ import it.unimi.dsi.fastutil.ints.Int2LongArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2LongMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
 import net.minecraft.world.phys.AABB;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import java.util.List;
 
@@ -59,6 +60,11 @@ public abstract class AbstractAnimalWorkStation<A extends Animal> extends Simple
 
     private boolean filterByCooldown(A animal) {
         return this.idToCooldownMap.containsKey(animal.getId());
+    }
+
+    @Override
+    public IItemHandlerModifiable getItemHandler() {
+        return this.wrappedHandler;
     }
 
     @Override

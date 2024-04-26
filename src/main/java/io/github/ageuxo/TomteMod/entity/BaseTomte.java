@@ -9,6 +9,7 @@ import io.github.ageuxo.TomteMod.entity.brain.behaviour.*;
 import io.github.ageuxo.TomteMod.entity.brain.sensor.DummyDoorSensor;
 import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
+import net.minecraft.core.GlobalPos;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -58,10 +59,7 @@ import net.tslat.smartbrainlib.api.core.behaviour.custom.move.FleeTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.move.MoveToWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetRandomWalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.path.SetWalkTargetToAttackTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.InvalidateAttackTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetPlayerLookTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.SetRandomLookTarget;
-import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
+import net.tslat.smartbrainlib.api.core.behaviour.custom.target.*;
 import net.tslat.smartbrainlib.api.core.schedule.SmartBrainSchedule;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
@@ -75,6 +73,7 @@ import org.slf4j.Logger;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
+import java.util.function.Predicate;
 
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte>, MoodyMob {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -182,8 +181,10 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public BrainActivityGroup<? extends BaseTomte> getIdleTasks() {
         return BrainActivityGroup.idleTasks(
                 new FirstApplicableBehaviour<>(
-                        new TargetOrRetaliate<>()
-                                .attackablePredicate(entity -> entity instanceof Enemy && !(entity instanceof Creeper)),
+                        new RetaliateBehaviour<>()
+                                .attackablePredicate(retaliateTargetPredicate()),
+                        new SetAttackTarget<>()
+                                .attackPredicate(this::huntEnemyTargetPredicate),
                         new AvoidEntity<>()
                                 .avoiding(livingEntity -> livingEntity instanceof Player).noCloserThan(2.0F)
                                 .stopCaringAfter(4.0F),
@@ -196,14 +197,27 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         );
     }
 
+    private static Predicate<LivingEntity> retaliateTargetPredicate() {
+        return entity -> entity.isAlive() && (!(entity instanceof Player player) || !player.isCreative());
+    }
+
+    private boolean huntEnemyTargetPredicate(LivingEntity entity) {
+        GlobalPos memory = BrainUtils.getMemory(this, MemoryModuleType.HOME);
+        return entity instanceof Enemy && !(entity instanceof Creeper)
+                && (entity.distanceToSqr(memory.pos().getCenter()) < 32);
+    }
+
     @Override
     public BrainActivityGroup<? extends BaseTomte> getFightTasks() {
+        //noinspection unchecked
         return BrainActivityGroup.fightTasks(
                 new InvalidateAttackTarget<>(),
-                new FleeTarget<>()
-                        .speedModifier(1.2f)
-                        .startCondition(pathfinderMob -> pathfinderMob.getHealth() < pathfinderMob.getMaxHealth() / 3),
-                new SetWalkTargetToAttackTarget<>(),
+                new FirstApplicableBehaviour<>(
+                        new FleeTarget<>()
+                                .speedModifier(1.2f)
+                                .startCondition(pathfinderMob -> pathfinderMob.getHealth() < pathfinderMob.getMaxHealth() / 3),
+                        new SetWalkTargetToAttackTarget<>()
+                ),
                 new AnimatableMeleeAttack<BaseTomte>(5)
                         .attackInterval((tomte)->11)
                         .whenStarting(tomte -> tomte.setAttacking(true))
@@ -220,18 +234,28 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                                 new GetPoisBehaviour<>()
                                         .setPoiFilter(type -> type.is(ModTags.WORK_STATIONS))
                                         .add(ModPoiTypes.MILKING_STATION.getKey(), ModMemoryTypes.MILKING_STATION.get())
+                                        .add(ModPoiTypes.SHEARING_STATION.getKey(), ModMemoryTypes.SHEARING_STATION.get())
                                         .cooldownFor(pathfinderMob -> 20)
                         ),
                         new FirstApplicableBehaviour<>(
                                 new SetWalkTargetToItem<>().setPredicate(this::shouldPickup),
                                 new SetWalkAndSimpleStealTarget<>().cooldownFor(entity -> 30),
                                 new SimpleStealingBehaviour<>(),
-                                new FirstApplicableBehaviour<>(
-                                        new FindMilkableBehaviour<>(),
-                                        new SetWalkTargetToInteractTarget<>(),
-                                        new MilkCowBehaviour()
-                                                .cooldownFor(tomte -> 12)
-                                ).cooldownFor(tomte -> 20),
+
+                                new FirstApplicableBehaviour<>( // Chores
+                                        new FirstApplicableBehaviour<>( // Find chore TODO finish this
+                                                new FindMilkableBehaviour<>().cooldownFor(entity -> 20),
+                                                new FindShearableBehaviour<>().cooldownFor(entity -> 20)
+                                        ),
+                                        new AllApplicableBehaviours<>(
+                                                new SetWalkTargetToInteractTarget<>(),
+                                                new FirstApplicableBehaviour<>( // Do chore
+                                                        new MilkCowBehaviour().cooldownFor(entity -> 20),
+                                                        new ShearSheepBehaviour().cooldownFor(entity -> 20)
+                                                )
+                                        )
+                                ), // END Chores
+
                                 new SetRandomWalkTarget<>()
                                         .cooldownFor(pathfinderMob -> pathfinderMob.getRandom().nextIntBetweenInclusive(30, 120))
                         )

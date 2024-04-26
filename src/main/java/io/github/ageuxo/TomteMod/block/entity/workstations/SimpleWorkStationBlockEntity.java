@@ -27,14 +27,14 @@ public abstract class SimpleWorkStationBlockEntity extends SimpleContainerBlockE
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     public SimpleWorkStationBlockEntity(BlockEntityType<?> blockEntityType, BlockPos pos, BlockState state, StationType stationType){
-        super(blockEntityType, pos, state, stationType.rows, stationType.columns);
+        super(blockEntityType, pos, state, stationType.rows, stationType.columns, stationType.extraSlots);
         this.type = stationType;
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        this.lazyItemHandler = LazyOptional.of(()-> itemHandler);
+        this.lazyItemHandler = LazyOptional.of(this::getItemHandler);
     }
 
     @Override
@@ -46,25 +46,25 @@ public abstract class SimpleWorkStationBlockEntity extends SimpleContainerBlockE
     }
 
     public enum StationType {
-        MILKING(3, 5, (animal -> animal instanceof Cow && !(animal instanceof MushroomCow)), MilkingWorkStationBE::new, Cow.class, WorkStationMenu::new),
-        SHEARING(3, 5, animal -> {
+        MILKING(3, 5, 0, (animal -> animal instanceof Cow && !(animal instanceof MushroomCow)), MilkingWorkStationBE::new, WorkStationMenu::new),
+        SHEARING(3, 5, 1, animal -> {
             if (animal instanceof Sheep sheep) return sheep.readyForShearing();
             return false;
-        }, ShearingWorkStationBE::new, Sheep.class, ((id, inventory, blockEntity) -> new  ShearingWorkStationMenu(id, inventory, (ShearingWorkStationBE) blockEntity)));
+        }, ShearingWorkStationBE::new, ((id, inventory, blockEntity) -> new  ShearingWorkStationMenu(id, inventory, (ShearingWorkStationBE) blockEntity)));
 
         public final Predicate<? super Animal> predicate;
         public final int rows;
         public final int columns;
         public final BlockEntitySupplier<SimpleWorkStationBlockEntity> blockEntitySupplier;
-        public final Class<? extends Animal> clazz;
         public final BlockEntityMenuConstructor<SimpleWorkStationBlockEntity> menu;
+        private final int extraSlots;
 
-        StationType(int rows, int columns, @Nullable Predicate<? super Animal> predicate, BlockEntitySupplier<SimpleWorkStationBlockEntity> blockEntitySupplier, Class<? extends Animal> clazz, BlockEntityMenuConstructor<SimpleWorkStationBlockEntity> menu){
+        StationType(int rows, int columns, int extraSlots, @Nullable Predicate<? super Animal> predicate, BlockEntitySupplier<SimpleWorkStationBlockEntity> blockEntitySupplier, BlockEntityMenuConstructor<SimpleWorkStationBlockEntity> menu){
             this.predicate = predicate;
             this.rows = rows;
             this.columns = columns;
+            this.extraSlots = extraSlots;
             this.blockEntitySupplier = blockEntitySupplier;
-            this.clazz = clazz;
             this.menu = menu;
         }
     }

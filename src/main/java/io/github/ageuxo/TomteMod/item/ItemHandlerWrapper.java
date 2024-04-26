@@ -4,17 +4,18 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.BiPredicate;
 
-public class ItemHandlerWrapper implements IItemHandler {
+public class ItemHandlerWrapper implements IItemHandlerModifiable {
 
-    public IItemHandlerModifiable baseHandler;
+    public ItemStackHandler baseHandler;
     public BiPredicate<Integer, ItemStack> insertFilter;
-    public Int2IntFunction slotLimiter = (i) -> 64;
+    public Int2IntFunction slotLimiter = (slot) -> 64;
 
-    public ItemHandlerWrapper(IItemHandlerModifiable baseHandler){
+    public ItemHandlerWrapper(ItemStackHandler baseHandler){
         this.baseHandler = baseHandler;
     }
 
@@ -58,5 +59,10 @@ public class ItemHandlerWrapper implements IItemHandler {
 
     public void setSlotLimiter(Int2IntFunction slotLimiter) {
         this.slotLimiter = slotLimiter;
+    }
+
+    @Override
+    public void setStackInSlot(int slot, @NotNull ItemStack stack) {
+        this.baseHandler.setStackInSlot(slot, stack);
     }
 }

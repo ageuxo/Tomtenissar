@@ -1,6 +1,7 @@
 package io.github.ageuxo.TomteMod.entity.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
+import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.block.entity.workstations.MilkingWorkStationBE;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
@@ -38,6 +39,7 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
         if (livingEntity instanceof Cow cow) {
             return entity.closerThan(cow, 1.2D);
         }
+        LogUtils.getLogger().debug("Distance to target greater than 1.2D");
         return false;
     }
 

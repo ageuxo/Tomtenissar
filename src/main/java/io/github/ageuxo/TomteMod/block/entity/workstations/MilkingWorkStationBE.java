@@ -69,8 +69,8 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     protected boolean hasValidContainer() {
         FluidStack fluidStack = new FluidStack(ForgeMod.MILK.get(), FluidType.BUCKET_VOLUME);
-        for (int i = 0; i < this.itemHandler.getSlots(); i++){
-            if (fluidFitsInSlot(this.itemHandler, i, fluidStack)){
+        for (int i = 0; i < this.getItemHandler().getSlots(); i++){
+            if (fluidFitsInSlot(this.getItemHandler(), i, fluidStack)){
                 return true;
             }
         }

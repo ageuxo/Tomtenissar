@@ -11,6 +11,7 @@ import io.github.ageuxo.TomteMod.entity.client.BaseTomteRenderer;
 import io.github.ageuxo.TomteMod.entity.client.ModModelLayers;
 import io.github.ageuxo.TomteMod.entity.client.TomteModel;
 import io.github.ageuxo.TomteMod.gui.ModMenuTypes;
+import io.github.ageuxo.TomteMod.gui.ShearingStationScreen;
 import io.github.ageuxo.TomteMod.gui.SimpleContainerScreen;
 import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -68,7 +69,7 @@ public class TomteMod {
             event.enqueueWork( ()-> {
                 MenuScreens.register(ModMenuTypes.PRESENT.get(), SimpleContainerScreen::new);
                 MenuScreens.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
-                MenuScreens.register(ModMenuTypes.SHEARING_STATION.get(), SimpleContainerScreen::new);
+                MenuScreens.register(ModMenuTypes.SHEARING_STATION.get(), ShearingStationScreen::new);
             });
         }
 
