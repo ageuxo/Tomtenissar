@@ -13,6 +13,7 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
@@ -25,8 +26,8 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(Registries.BLOCK, TomteMod.MODID);
 
-    public static final RegistryObject<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new);
-    public static final RegistryObject<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new);
+    public static final RegistryObject<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new, ShearingWorkStationBE::new);
+    public static final RegistryObject<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new);
 
     protected static <T extends Block> RegistryObject<T> registerBlockWithItem(String name, Supplier<T> blockSupplier){
         RegistryObject<T> ret = BLOCKS.register(name, blockSupplier);
@@ -34,9 +35,9 @@ public class ModBlocks {
         return ret;
     }
 
-    protected static <T extends AbstractAnimalWorkStation<?>> RegistryObject<SimpleWorkStationBlock<T>> registerWorkStation(String baseName, BlockBehaviour.Properties properties, BlockEntityMenuConstructor<T> menuConstructor){
+    protected static <T extends AbstractAnimalWorkStation<?>> RegistryObject<SimpleWorkStationBlock<T>> registerWorkStation(String baseName, BlockBehaviour.Properties properties, BlockEntityMenuConstructor<T> menuConstructor, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier){
         String fullName = baseName + "_station";
-        return registerBlockWithItem(fullName, ()->new SimpleWorkStationBlock<>(properties, menuConstructor));
+        return registerBlockWithItem(fullName, ()->new SimpleWorkStationBlock<>(properties, menuConstructor, blockEntitySupplier));
     }
 
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block){

@@ -31,9 +31,10 @@ public class SimpleWorkStationBlock<S extends AbstractAnimalWorkStation<?>> exte
     public BlockEntityMenuConstructor<S> menuConstructor;
     public BlockEntityType.BlockEntitySupplier<S> blockEntitySupplier;
 
-    protected SimpleWorkStationBlock(Properties pProperties, BlockEntityMenuConstructor<S> menuConstructor) {
+    protected SimpleWorkStationBlock(Properties pProperties, BlockEntityMenuConstructor<S> menuConstructor, BlockEntityType.BlockEntitySupplier<S> blockEntitySupplier) {
         super(pProperties);
         this.menuConstructor = menuConstructor;
+        this.blockEntitySupplier = blockEntitySupplier;
     }
 
     @Override

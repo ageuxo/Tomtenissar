@@ -250,8 +250,8 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                                         new AllApplicableBehaviours<>(
                                                 new SetWalkTargetToInteractTarget<>(),
                                                 new FirstApplicableBehaviour<>( // Do chore
-                                                        new MilkCowBehaviour().cooldownFor(entity -> 20),
-                                                        new ShearSheepBehaviour().cooldownFor(entity -> 20)
+                                                        new MilkCowBehaviour(),
+                                                        new ShearSheepBehaviour()
                                                 )
                                         )
                                 ), // END Chores

@@ -43,7 +43,6 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
     @Override
     protected void start(BaseTomte entity) {
         entity.setStealing(true);
-//        entity.playSound(SoundEvents.GENERIC_DRINK);
     }
 
     @Override
@@ -53,7 +52,6 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
         LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
         if (be instanceof ShearingWorkStationBE shearingStation && livingEntity instanceof Sheep sheep){
             shearingStation.doAction(sheep);
-//            entity.playSound(SoundEvents.COW_MILK);
         }
     }
 

@@ -13,7 +13,6 @@ import net.minecraftforge.registries.RegistryObject;
 public class ModMenuTypes {
     public static final DeferredRegister<MenuType<?>> MENUS = DeferredRegister.create(Registries.MENU, TomteMod.MODID);
 
-    public static final RegistryObject<MenuType<PresentMenu>> PRESENT = registerMenuType(PresentMenu::new, "present_menu");
     public static final RegistryObject<MenuType<MilkingWorkStationMenu>> WORK_STATION = registerMenuType(MilkingWorkStationMenu::new, "work_station_menu");
     public static final RegistryObject<MenuType<ShearingWorkStationMenu>> SHEARING_STATION = registerMenuType(ShearingWorkStationMenu::new, "shearing_station_menu");
 

@@ -27,6 +27,7 @@ public abstract class AbstractAnimalWorkStation<A extends Animal> extends Simple
     public AbstractAnimalWorkStation(BlockEntityType<?> blockEntityType, BlockPos pPos, BlockState pBlockState, Predicate<? super A> predicate, int rows, int columns, int extraSlots) {
         super(blockEntityType, pPos, pBlockState, rows, columns, extraSlots);
         this.predicate = predicate;
+        this.wrappedHandler = new ItemHandlerWrapper(this.itemHandler);
     }
 
     public abstract void doAction(A animal);
