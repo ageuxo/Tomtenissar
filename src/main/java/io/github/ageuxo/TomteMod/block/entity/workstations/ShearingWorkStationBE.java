@@ -15,8 +15,11 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ShearsItem;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -52,10 +55,15 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
     @Override
     public void doAction(Sheep sheep) {
         if (!this.level.isClientSide){
-            ItemStack stack = getShearsSlot();
-            if (stack.getItem() instanceof ShearsItem shears){
-                if (shears.interactLivingEntity(stack, this.fakePlayer, sheep, InteractionHand.MAIN_HAND) == InteractionResult.SUCCESS){
-                    this.idToCooldownMap.put(sheep.getId(), sheep.level().getGameTime());
+            ItemStack shearsStack = getShearsSlot();
+            if (sheep.isShearable(shearsStack, this.level, this.worldPosition)){
+                this.idToCooldownMap.put(sheep.getId(), sheep.level().getGameTime()); // Maybe switch to UUIDs instead?
+                List<ItemStack> drops = sheep.onSheared(this.fakePlayer, shearsStack, this.level, BlockPos.containing(sheep.position()), shearsStack.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE));
+                for (ItemStack drop : drops){
+                    ItemStack remainder = ItemHandlerHelper.insertItemStacked(this.wrappedHandler, drop, false);
+                    if (!remainder.isEmpty()){ // Drop on ground if it doesn't fit into the inventory
+                        sheep.spawnAtLocation(remainder);
+                    }
                 }
             }
         }

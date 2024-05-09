@@ -55,11 +55,6 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
     }
 
     @Override
-    protected void tick(BaseTomte entity) {
-        LOGGER.debug("{}", this.delayFinishedAt - entity.level().getGameTime());
-    }
-
-    @Override
     protected void doDelayedAction(BaseTomte entity) {
         LOGGER.debug("delayed action");
         BlockPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.MILKING_STATION.get()).pos();

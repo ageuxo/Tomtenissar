@@ -9,11 +9,14 @@ import net.minecraft.world.entity.animal.MushroomCow;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
+import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.items.IItemHandler;
@@ -49,12 +52,18 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
             int size = this.itemHandler.getSlots();
             FluidStack stack = new FluidStack(ForgeMod.MILK.get(), 1000);
             for (int i = 0; i < size; i++){
-                if (fluidFitsInSlot(this.itemHandler, i, stack)){
+                if (this.itemHandler.getStackInSlot(i).is(Items.BUCKET)){
+                    ItemStack filled = FluidUtil.getFilledBucket(stack);
+                    if (!filled.isEmpty()){
+                        this.itemHandler.setStackInSlot(i, filled);
+                        break;
+                    }
+                } else if (fluidFitsInSlot(this.itemHandler, i, stack)){
                     Optional<IFluidHandlerItem> handlerItem = this.itemHandler.getStackInSlot(i).getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
                     if (handlerItem.isPresent()){
                         handlerItem.get().fill(stack, IFluidHandler.FluidAction.EXECUTE);
                         this.itemHandler.setStackInSlot(i, handlerItem.get().getContainer());
-                        return;
+                        break;
                     }
                 }
             }
