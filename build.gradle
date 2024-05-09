@@ -5,6 +5,7 @@ plugins {
     id 'net.minecraftforge.gradle' version '[6.0,6.2)'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'org.spongepowered.mixin' version '0.7.+'
+    id "me.shedaniel.unified-publishing" version "0.1.+"
 }
 
 version = mod_version
@@ -207,20 +208,30 @@ tasks.named('jar', Jar).configure {
 //     dependsOn 'reobfJar'
 // }
 
-// Example configuration to allow publishing using the maven-publish plugin
-publishing {
-    publications {
-        register('mavenJava', MavenPublication) {
-            artifact jar
-        }
-    }
-    repositories {
-        maven {
-            url "file://${project.projectDir}/mcmodsrepo"
-        }
-    }
-}
-
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
+
+apply from: rootDir.getPath() + '/secrets.properties'
+
+unifiedPublishing {
+    project {
+        gameVersions = [minecraft_version]
+        gameLoaders.add('forge')
+
+        mainPublication tasks.jarJar
+
+        displayName = tasks.jarJar.archiveFileName
+
+        curseforge {
+            token = rootProject.curseforgeApiToken
+            id = '954660'
+        }
+
+        modrinth {
+            token = rootProject.modrinthApiToken
+            id = 'ymFArk93'
+        }
+
+    }
 }
