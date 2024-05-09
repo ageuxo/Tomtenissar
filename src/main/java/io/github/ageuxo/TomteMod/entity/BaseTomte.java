@@ -487,4 +487,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     protected float getJumpPower() {
         return 0.50F * this.getBlockJumpFactor() + this.getJumpBoostPower();
     }
+
+    @Override
+    public void checkDespawn() { // Override this to stop despawning at distance
+
+    }
 }
