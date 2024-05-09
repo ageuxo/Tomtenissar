@@ -219,9 +219,9 @@ unifiedPublishing {
         gameVersions = [minecraft_version]
         gameLoaders.add('forge')
 
-        mainPublication tasks.jarJar
+        mainPublication tasks.jar
 
-        displayName = tasks.jarJar.archiveFileName
+        displayName = tasks.jar.archiveFileName
 
         relations {
             depends {
