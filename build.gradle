@@ -223,6 +223,13 @@ unifiedPublishing {
 
         displayName = tasks.jarJar.archiveFileName
 
+        relations {
+            depends {
+                curseforge = "smartbrainlib"
+                modrinth = "smartbrainlib"
+            }
+        }
+
         curseforge {
             token = rootProject.curseforgeApiToken
             id = '954660'
