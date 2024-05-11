@@ -50,7 +50,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
 
     @Override
     protected void start(E entity) {
-        LOGGER.debug("start");
+        LOGGER.trace( "start");
         entity.setStealing(true);
         entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
         super.start(entity);
@@ -72,7 +72,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
         if (level.getGameTime() - this.lastCheck < this.checkCooldown || level.getRandom().nextInt(2) != 1) {
             return false;
         } else if (entity.getMood() < 0){ //TODO tweak this
-            LOGGER.debug("checkExtraStartConditions, mood:{}", entity.getMood());
+            LOGGER.trace( "checkExtraStartConditions, mood:{}", entity.getMood());
             this.pos = BrainUtils.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
             this.lastCheck = level.getGameTime();
             boolean closeEnough = this.pos.closerToCenterThan(entity.position(), this.minDistance);
@@ -118,7 +118,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
                     int simInserted = entity.itemHandler.insertItem(slot, stolen, true).getCount();
                     int simStolen = stolen.getCount();
                     if (simInserted < simStolen){
-                        LOGGER.debug("Stealing {}", stolen);
+                        LOGGER.trace( "Stealing {}", stolen);
                         stolen = itemHandler.extractItem(i, amount, false);
                         entity.itemHandler.insertItem(slot, stolen, false);
                         entity.addMood(stealableMoodValue, true);

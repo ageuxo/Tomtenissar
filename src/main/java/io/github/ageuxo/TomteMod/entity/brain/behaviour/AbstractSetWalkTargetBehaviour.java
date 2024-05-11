@@ -58,7 +58,7 @@ public abstract class AbstractSetWalkTargetBehaviour<E extends Mob, T extends En
     @Override
     protected void start(E entity) {
         float distance = entity.distanceTo(this.target);
-        LOGGER.debug("{} ,target {}", distance, this.target);
+        LOGGER.trace( "{} ,target {}", distance, this.target);
         BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target, this.speedMod.apply(entity, this.target), this.closeEnoughDistance.apply(entity, this.target)));
         BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, new EntityTracker(this.target, false));
     }

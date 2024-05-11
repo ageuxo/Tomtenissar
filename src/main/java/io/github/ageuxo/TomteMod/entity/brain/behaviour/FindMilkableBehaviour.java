@@ -42,10 +42,10 @@ public class FindMilkableBehaviour<E extends LivingEntity> extends ExtendedBehav
                     this.milkingStation = milkingStationBE;
                     return true;
                 } else {
-                    LOGGER.debug("MilkingStation can't be worked at currently");
+                    LOGGER.trace( "MilkingStation can't be worked at currently");
                 }
             } else {
-                LOGGER.debug("Position is not milking station: {}", pos.pos());
+                LOGGER.trace( "Position is not milking station: {}", pos.pos());
             }
         }
         BrainUtils.clearMemory(entity, ModMemoryTypes.MILKING_STATION.get());
@@ -59,7 +59,7 @@ public class FindMilkableBehaviour<E extends LivingEntity> extends ExtendedBehav
             Cow cow = cowList.get(entity.getRandom().nextInt(cowList.size()));
             BrainUtils.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, cow);
         } else {
-            LOGGER.debug("No valid target in cowList");
+            LOGGER.trace( "No valid target in cowList");
         }
     }
 }

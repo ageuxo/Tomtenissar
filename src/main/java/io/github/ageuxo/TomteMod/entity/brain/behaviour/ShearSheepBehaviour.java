@@ -41,20 +41,20 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
         if (livingEntity instanceof Sheep sheep) {
             return entity.closerThan(sheep, 1.2D);
         }
-        LOGGER.debug("extraConditions not met");
+        LOGGER.trace( "extraConditions not met");
         return false;
     }
 
     @Override
     protected void start(BaseTomte entity) {
         entity.setStealing(true);
-        LOGGER.debug("starting shearing");
+        LOGGER.trace( "starting shearing");
         BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
     }
 
     @Override
     protected void doDelayedAction(BaseTomte entity) {
-        LOGGER.debug("delayed action");
+        LOGGER.trace( "delayed action");
         BlockPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.SHEARING_STATION.get()).pos();
         BlockEntity be = entity.level().getBlockEntity(pos);
         LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);

@@ -61,7 +61,7 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
             BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
             return false;
         }
-        LOGGER.debug("extraCheck: {}, edible:{}", handItem, handItem.isEdible());
+        LOGGER.trace( "extraCheck: {}, edible:{}", handItem, handItem.isEdible());
         return handItem.isEdible() && !entity.isUsingItem();
     }
 
@@ -83,7 +83,7 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
         this.animationCallback.accept(false);
         this.finishedCallback.accept(entity, this.eatingStack.copy());
         this.eatingStack = null;
-        LOGGER.debug("finished");
+        LOGGER.trace( "finished");
         if (entity.getItemBySlot(this.equipmentSlot).isEmpty()){
             BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
         }

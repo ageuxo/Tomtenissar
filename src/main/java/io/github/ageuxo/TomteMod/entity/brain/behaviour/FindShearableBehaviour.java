@@ -2,7 +2,6 @@ package io.github.ageuxo.TomteMod.entity.brain.behaviour;
 
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
-import io.github.ageuxo.TomteMod.block.entity.workstations.MilkingWorkStationBE;
 import io.github.ageuxo.TomteMod.block.entity.workstations.ShearingWorkStationBE;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import net.minecraft.core.GlobalPos;
@@ -10,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
-import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.entity.animal.Sheep;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.util.BrainUtils;
@@ -44,10 +42,10 @@ public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBeha
                     this.shearingStation = shearingWorkStationBE;
                     return true;
                 } else {
-                    LOGGER.debug("ShearingStation can't be worked at currently");
+                    LOGGER.trace( "ShearingStation can't be worked at currently");
                 }
             } else {
-                LOGGER.debug("Position is not shearing station: {}", pos.pos());
+                LOGGER.trace( "Position is not shearing station: {}", pos.pos());
             }
         }
         BrainUtils.clearMemory(entity, ModMemoryTypes.SHEARING_STATION.get());
@@ -61,7 +59,7 @@ public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBeha
             Sheep sheep = sheepList.get(entity.getRandom().nextInt(sheepList.size()));
             BrainUtils.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, sheep);
         } else {
-            LOGGER.debug("No valid target in sheepList");
+            LOGGER.trace( "No valid target in sheepList");
         }
     }
 }

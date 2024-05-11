@@ -59,12 +59,12 @@ public class SetWalkAndSimpleStealTarget<E extends Mob & MoodyMob> extends Exten
                     if (this.predicate.test(pair.getFirst(), pair.getSecond()) && !this.searchedPosCache.contains(pair.getFirst())) {
                         this.target = pair;
                         addToCacheAndTrim(pair.getFirst());
-                        LOGGER.debug("checkExtra cache:{}, {}, {}", searchedPosCache.size(), pair.getFirst(), pair.getSecond());
+                        LOGGER.trace("checkExtra cache:{}, {}, {}", searchedPosCache.size(), pair.getFirst(), pair.getSecond());
                         break;
                     }
                 }
                 if (this.target == null) {
-                    LOGGER.debug("Found no valid pos");
+                    LOGGER.trace( "Found no valid pos");
                 }
             }
         }

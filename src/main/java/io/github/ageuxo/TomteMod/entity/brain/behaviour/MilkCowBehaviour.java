@@ -42,7 +42,7 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
         if (livingEntity instanceof Cow cow) {
             return entity.closerThan(cow, 1.2D);
         }
-        LOGGER.debug("extraConditions not met");
+        LOGGER.trace( "extraConditions not met");
         return false;
     }
 
@@ -50,13 +50,13 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
     protected void start(BaseTomte entity) {
         entity.setStealing(true); // start animation
         entity.playSound(SoundEvents.GENERIC_DRINK);
-        LOGGER.debug("starting milking");
+        LOGGER.trace( "starting milking");
         BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
     }
 
     @Override
     protected void doDelayedAction(BaseTomte entity) {
-        LOGGER.debug("delayed action");
+        LOGGER.trace( "delayed action");
         BlockPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.MILKING_STATION.get()).pos();
         BlockEntity be = entity.level().getBlockEntity(pos);
         LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
@@ -64,7 +64,7 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
             milkStation.doAction(cow);
             entity.playSound(SoundEvents.COW_MILK);
             BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 40);
-            LOGGER.debug("milked and cooling down");
+            LOGGER.trace( "milked and cooling down");
         }
     }
 
