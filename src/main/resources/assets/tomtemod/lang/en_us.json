@@ -5,5 +5,6 @@
   "tomtemod.gui.workstation.milking": "Milking Station",
   "entity.tomtemod.tomte": "Tomte",
   "block.tomtemod.milking_station": "Milking workstation",
-  "block.tomtemod.shearing_station": "Shearing workstation"
+  "block.tomtemod.shearing_station": "Shearing workstation",
+  "item.tomtemod.tomte_egg": "Tomte Egg"
 }

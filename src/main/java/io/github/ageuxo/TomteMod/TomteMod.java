@@ -12,6 +12,7 @@ import io.github.ageuxo.TomteMod.entity.client.TomteModel;
 import io.github.ageuxo.TomteMod.gui.ModMenuTypes;
 import io.github.ageuxo.TomteMod.gui.ShearingStationScreen;
 import io.github.ageuxo.TomteMod.gui.SimpleContainerScreen;
+import io.github.ageuxo.TomteMod.item.ModCreativeTabs;
 import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
@@ -42,6 +43,7 @@ public class TomteMod {
         ModSensors.register(modEventBus);
         ModPoiTypes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModCreativeTabs.register(modEventBus);
 
         modEventBus.register(ModEvents.class);
 

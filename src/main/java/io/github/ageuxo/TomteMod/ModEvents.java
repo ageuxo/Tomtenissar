@@ -1,6 +1,7 @@
 package io.github.ageuxo.TomteMod;
 
 import io.github.ageuxo.TomteMod.datagen.ModBlockStateProvider;
+import io.github.ageuxo.TomteMod.datagen.ModItemModelProvider;
 import io.github.ageuxo.TomteMod.datagen.ModTagsProviders;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
@@ -28,5 +29,6 @@ public class ModEvents {
         CompletableFuture<HolderLookup.Provider> lookup = event.getLookupProvider();
         ModTagsProviders.addAll(generator, packOutput, lookup, fileHelper);
         generator.addProvider(true, new ModBlockStateProvider(packOutput, fileHelper));
+        generator.addProvider(true, new ModItemModelProvider(packOutput, fileHelper));
     }
 }
