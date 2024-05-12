@@ -3,6 +3,8 @@ package io.github.ageuxo.TomteMod;
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
+import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationItemRenderer;
+import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationRenderer;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -14,6 +16,7 @@ import io.github.ageuxo.TomteMod.gui.ShearingStationScreen;
 import io.github.ageuxo.TomteMod.gui.SimpleContainerScreen;
 import io.github.ageuxo.TomteMod.item.ModCreativeTabs;
 import io.github.ageuxo.TomteMod.item.ModItems;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
@@ -63,6 +66,12 @@ public class TomteMod {
         }
 
         @SubscribeEvent
+        public static void registerRenderers(EntityRenderersEvent.RegisterRenderers event){
+            event.registerBlockEntityRenderer(ModBlockEntities.MILKING_STATION.get(), AnimalWorkStationRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.SHEARING_STATION.get(), AnimalWorkStationRenderer::new);
+        }
+
+        @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event){
             EntityRenderers.register(ModEntities.TOMTE.get(), BaseTomteRenderer::new);
 
@@ -70,6 +79,9 @@ public class TomteMod {
                 MenuScreens.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
                 MenuScreens.register(ModMenuTypes.SHEARING_STATION.get(), ShearingStationScreen::new);
             });
+
+            Minecraft minecraft = Minecraft.getInstance();
+            AnimalWorkStationItemRenderer.INSTANCE = new AnimalWorkStationItemRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels());
         }
     }
 }

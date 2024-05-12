@@ -47,6 +47,11 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
         return hasValidContainer();
     }
 
+    @Override
+    public ItemStack getDisplayItem() {
+        return Items.MILK_BUCKET.getDefaultInstance();
+    }
+
     public void doAction(Cow cow){
         if (!this.level.isClientSide){
             int size = this.itemHandler.getSlots();

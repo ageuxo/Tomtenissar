@@ -7,6 +7,7 @@ import it.unimi.dsi.fastutil.ints.Int2LongMap;
 import it.unimi.dsi.fastutil.ints.IntArrayList;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.animal.Animal;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.entity.EntityTypeTest;
@@ -73,4 +74,7 @@ public abstract class AbstractAnimalWorkStation<A extends Animal> extends Simple
     public abstract List<A> getWorkableAnimals();
 
     public abstract boolean canBeWorkedAt();
+
+    public abstract ItemStack getDisplayItem();
+
 }

@@ -14,6 +14,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
@@ -50,6 +51,11 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
     @Override
     public boolean canBeWorkedAt() {
         return this.wrappedHandler.getStackInSlot(SHEARS_SLOT).getItem() instanceof ShearsItem;
+    }
+
+    @Override
+    public ItemStack getDisplayItem() {
+        return Items.SHEARS.getDefaultInstance();
     }
 
     @Override

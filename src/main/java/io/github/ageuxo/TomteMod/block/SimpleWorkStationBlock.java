@@ -10,6 +10,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
@@ -48,6 +49,12 @@ public class SimpleWorkStationBlock<S extends AbstractAnimalWorkStation<?>> exte
         return blockEntitySupplier.create(pPos, pState);
     }
 
+    @Nullable
+    @Override
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return this.defaultBlockState().setValue(FACING, pContext.getHorizontalDirection());
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
@@ -68,7 +75,7 @@ public class SimpleWorkStationBlock<S extends AbstractAnimalWorkStation<?>> exte
     @SuppressWarnings("deprecation")
     @Override
     public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
+        return RenderShape.ENTITYBLOCK_ANIMATED;
     }
 
     @SuppressWarnings("deprecation")
