@@ -1,5 +1,6 @@
 package io.github.ageuxo.TomteMod.entity;
 
+import net.minecraft.core.Holder;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.gameevent.EntityPositionSource;
@@ -17,9 +18,9 @@ public class CustomGameEventListener<E extends Entity> implements GameEventListe
     protected final Predicate<GameEvent.Context> filter;
     protected final PositionSource positionSource;
     protected final int listenerRadius;
-    protected final GameEvent gameEvent;
+    protected final Holder<GameEvent> gameEvent;
 
-    public CustomGameEventListener(E entity, GameEvent gameEvent, Consumer<E> callback, Predicate<GameEvent.Context> filter, int listenerRadius) {
+    public CustomGameEventListener(E entity, Holder<GameEvent> gameEvent, Consumer<E> callback, Predicate<GameEvent.Context> filter, int listenerRadius) {
         this.e = entity;
         this.gameEvent = gameEvent;
         this.callback = callback;
@@ -39,9 +40,9 @@ public class CustomGameEventListener<E extends Entity> implements GameEventListe
     }
 
     @Override
-    public boolean handleGameEvent(ServerLevel pLevel, GameEvent pGameEvent, GameEvent.Context pContext, Vec3 pPos) {
-        if (pGameEvent == this.gameEvent) {
-            if (this.filter.test(pContext)) {
+    public boolean handleGameEvent(ServerLevel level, Holder<GameEvent> gameEvent, GameEvent.Context context, Vec3 pos) {
+        if (gameEvent.getKey() == this.gameEvent.getKey()) {
+            if (this.filter.test(context)) {
                 this.callback.accept(this.e);
                 return true;
             }

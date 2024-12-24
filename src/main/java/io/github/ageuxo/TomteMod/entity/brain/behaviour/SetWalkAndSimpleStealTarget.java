@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
 import net.tslat.smartbrainlib.registry.SBLMemoryTypes;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.LinkedList;
@@ -49,10 +49,10 @@ public class SetWalkAndSimpleStealTarget<E extends Mob & MoodyMob> extends Exten
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         if (entity.getMood() < 0){
-            var memory = BrainUtils.getMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
+            var memory = BrainUtil.getMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
             //noinspection DataFlowIssue
             if (memory.isEmpty()) {
-                BrainUtils.clearMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
+                BrainUtil.clearMemory(entity, SBLMemoryTypes.NEARBY_BLOCKS.get());
                 return false;
             } else {
                 for (Pair<BlockPos, BlockState> pair : memory) {
@@ -88,10 +88,10 @@ public class SetWalkAndSimpleStealTarget<E extends Mob & MoodyMob> extends Exten
 
     @Override
     protected void start(E entity) {
-        BrainUtils.setMemory(entity, ModMemoryTypes.STEAL_TARGET.get(), this.target.getFirst());
+        BrainUtil.setMemory(entity, ModMemoryTypes.STEAL_TARGET.get(), this.target.getFirst());
         BlockPosTracker posTracker = new BlockPosTracker(this.target.getFirst());
-        BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(posTracker, this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
-        BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, posTracker);
+        BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(posTracker, this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
+        BrainUtil.setMemory(entity, MemoryModuleType.LOOK_TARGET, posTracker);
     }
 
     @Override

@@ -1,12 +1,13 @@
 package io.github.ageuxo.TomteMod.item;
 
-import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationItemRenderer;
-import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import com.mojang.serialization.Codec;
+import io.github.ageuxo.TomteMod.block.ModBlocks;
+import io.github.ageuxo.TomteMod.block.SimpleWorkStationBlock;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.extensions.common.IClientItemExtensions;
-
-import java.util.function.Consumer;
+import net.neoforged.neoforge.registries.DeferredBlock;
 
 public class BEWLRItem extends BlockItem {
     private final Type type;
@@ -15,26 +16,31 @@ public class BEWLRItem extends BlockItem {
         this.type = type;
     }
 
-    @Override
-    public void initializeClient(Consumer<IClientItemExtensions> consumer) {
-        consumer.accept(new IClientItemExtensions() {
-            @Override
-            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
-                return AnimalWorkStationItemRenderer.INSTANCE;
-            }
-        });
-    }
-
     public Type getType() {
         return type;
     }
 
     public enum Type{
-        SHEARING,
-        MILKING
+        SHEARING(Items.SHEARS, ModBlocks.SHEARING_WORK_STATION),
+        MILKING(Items.MILK_BUCKET, ModBlocks.MILKING_WORK_STATION);
+
+        private final Item displayItem;
+        private final DeferredBlock<? extends SimpleWorkStationBlock<?>> block;
+
+        Type(Item displayItem, DeferredBlock<? extends SimpleWorkStationBlock<?>> block) {
+            this.displayItem = displayItem;
+            this.block = block;
+        }
+
+        public Item displayItem() {
+            return displayItem;
+        }
+
+        public DeferredBlock<? extends SimpleWorkStationBlock<?>> block() {
+            return block;
+        }
+
+        public static final Codec<Type> CODEC = Codec.STRING.xmap(Type::valueOf, Type::name);
     }
-
-
-
 
 }

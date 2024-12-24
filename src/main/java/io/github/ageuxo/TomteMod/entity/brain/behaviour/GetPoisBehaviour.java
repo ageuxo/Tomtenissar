@@ -13,7 +13,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,7 +43,7 @@ public class GetPoisBehaviour<E extends PathfinderMob> extends ExtendedBehaviour
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        return runForExistingPois || poiToMemoryMap.values().stream().noneMatch(memoryType -> BrainUtils.hasMemory(entity, memoryType));
+        return runForExistingPois || poiToMemoryMap.values().stream().noneMatch(memoryType -> BrainUtil.hasMemory(entity, memoryType));
     }
 
     @Override
@@ -51,9 +51,9 @@ public class GetPoisBehaviour<E extends PathfinderMob> extends ExtendedBehaviour
         PoiManager poiManager = ((ServerLevel) entity.level()).getPoiManager();
         for (Map.Entry<Holder<PoiType>, MemoryModuleType<GlobalPos>> entry : poiToMemoryMap.entrySet()){
             MemoryModuleType<GlobalPos> memory = entry.getValue();
-            GlobalPos globalPos = BrainUtils.getMemory(entity, memory);
+            GlobalPos globalPos = BrainUtil.getMemory(entity, memory);
             if (globalPos != null && !poiManager.exists(globalPos.pos(), typeHolder -> typeHolder.is(entry.getKey().unwrapKey().orElseThrow()))) {
-                BrainUtils.clearMemory(entity, memory);
+                BrainUtil.clearMemory(entity, memory);
             }
         }
 
@@ -61,8 +61,8 @@ public class GetPoisBehaviour<E extends PathfinderMob> extends ExtendedBehaviour
         var pairs = pairStream.collect(Collectors.toUnmodifiableSet());
         for (Pair<Holder<PoiType>, BlockPos> pair : pairs){
             MemoryModuleType<GlobalPos> memoryType = poiToMemoryMap.get(pair.getFirst());
-            if (!BrainUtils.hasMemory(entity, memoryType)){
-                BrainUtils.setMemory(entity, memoryType, GlobalPos.of(entity.level().dimension(), pair.getSecond()));
+            if (!BrainUtil.hasMemory(entity, memoryType)){
+                BrainUtil.setMemory(entity, memoryType, GlobalPos.of(entity.level().dimension(), pair.getSecond()));
             }
         }
     }
@@ -73,8 +73,7 @@ public class GetPoisBehaviour<E extends PathfinderMob> extends ExtendedBehaviour
     }
 
     public GetPoisBehaviour<E> add(ResourceKey<PoiType> poiKey, MemoryModuleType<GlobalPos> memoryType){
-        //noinspection deprecation
-        this.poiToMemoryMap.put(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getHolderOrThrow(poiKey), memoryType);
+        this.poiToMemoryMap.put(BuiltInRegistries.POINT_OF_INTEREST_TYPE.getOrThrow(poiKey), memoryType);
         this.memoryRequirements.add(Pair.of(memoryType, MemoryStatus.REGISTERED));
         return this;
     }

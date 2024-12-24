@@ -9,15 +9,16 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.sensing.SensorType;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.Capabilities;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.PredicateSensor;
 import net.tslat.smartbrainlib.object.SquareRadius;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -44,25 +45,7 @@ public class NearbyBlockEntitiesSensor<E extends LivingEntity> extends Predicate
      * @return this
      */
     public NearbyBlockEntitiesSensor<E> setInventoryCapabilityPredicate(){
-        this.setPredicate((pair, e) -> capabilityPredicate(pair, ForgeCapabilities.ITEM_HANDLER));
-        return this;
-    }
-
-    /**
-     * Helper for setting the predicate to filter for BEs with Energy Capabilities
-     * @return this
-     */
-    public NearbyBlockEntitiesSensor<E> setEnergyCapabilityPredicate(){
-        this.setPredicate((pair, e) -> capabilityPredicate(pair, ForgeCapabilities.ENERGY));
-        return this;
-    }
-
-    /**
-     * Helper for setting the predicate to filter for BEs with Fluid Capabilities
-     * @return this
-     */
-    public NearbyBlockEntitiesSensor<E> setFluidCapabilityPredicate(){
-        this.setPredicate((pair, e) -> capabilityPredicate(pair, ForgeCapabilities.FLUID_HANDLER));
+        this.setPredicate((pair, e) -> capabilityPredicate(pair, Capabilities.ItemHandler.BLOCK, null));
         return this;
     }
 
@@ -80,9 +63,9 @@ public class NearbyBlockEntitiesSensor<E extends LivingEntity> extends Predicate
             }
         }
         if (pairList.isEmpty()){
-            BrainUtils.clearMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
+            BrainUtil.clearMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
         } else {
-            BrainUtils.setMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get(), pairList);
+            BrainUtil.setMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get(), pairList);
         }
     }
 
@@ -108,7 +91,11 @@ public class NearbyBlockEntitiesSensor<E extends LivingEntity> extends Predicate
         return this;
     }
 
-    protected static boolean capabilityPredicate(Pair<BlockState, BlockEntity> stateBlockEntityPair, Capability<?> capability){
-        return stateBlockEntityPair.getFirst().hasBlockEntity() && stateBlockEntityPair.getSecond().getCapability(capability).isPresent();
+    protected static <T> boolean capabilityPredicate(Pair<BlockState, BlockEntity> stateBlockEntityPair, BlockCapability<?, T> capability, T context){
+        BlockState state = stateBlockEntityPair.getFirst();
+        BlockEntity be = stateBlockEntityPair.getSecond();
+        Level level = be.getLevel();
+        return state.hasBlockEntity() && level.getCapability(capability, be.getBlockPos(), be.getBlockState(), be, context) != null;
+
     }
 }

@@ -7,8 +7,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.tags.ItemTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -16,18 +14,18 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.util.FakePlayer;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.common.util.FakePlayer;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.UUID;
 
 public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
 
     public static final int SHEARS_SLOT = 15;
+    public static final GameProfile SHEARING_PROFILE = new GameProfile(UUID.randomUUID(), "tomtemod:shearingworkstation");
 
     protected FakePlayer fakePlayer;
 
@@ -62,13 +60,13 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
     public void doAction(Sheep sheep) {
         if (!this.level.isClientSide){
             ItemStack shearsStack = getShearsSlot();
-            if (sheep.isShearable(shearsStack, this.level, this.worldPosition)){
+            if (sheep.isShearable(this.fakePlayer, shearsStack, this.level, this.worldPosition)){
                 this.idToCooldownMap.put(sheep.getId(), sheep.level().getGameTime()); // Maybe switch to UUIDs instead?
-                List<ItemStack> drops = sheep.onSheared(this.fakePlayer, shearsStack, this.level, BlockPos.containing(sheep.position()), shearsStack.getEnchantmentLevel(Enchantments.BLOCK_FORTUNE));
+                List<ItemStack> drops = sheep.onSheared(this.fakePlayer, shearsStack, this.level, BlockPos.containing(sheep.position()));
                 for (ItemStack drop : drops){
                     ItemStack remainder = ItemHandlerHelper.insertItemStacked(this.wrappedHandler, drop, false);
                     if (!remainder.isEmpty()){ // Drop on ground if it doesn't fit into the inventory
-                        sheep.spawnAtLocation(remainder);
+                        sheep.spawnAtLocation((ServerLevel) this.level, remainder);
                     }
                 }
             }
@@ -93,7 +91,7 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
     public void onLoad() {
         super.onLoad();
         if (!this.level.isClientSide){
-            this.fakePlayer = new FakePlayer((ServerLevel) this.level, new GameProfile(null, "tomtemod:shearingworkstation"));
+            this.fakePlayer = new FakePlayer((ServerLevel) this.level, SHEARING_PROFILE);
         }
     }
 }

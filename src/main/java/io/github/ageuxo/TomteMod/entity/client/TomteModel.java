@@ -4,25 +4,24 @@ package io.github.ageuxo.TomteMod.entity.client;// Made with Blockbench 4.9.1
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
-import io.github.ageuxo.TomteMod.entity.BaseTomte;
+import io.github.ageuxo.TomteMod.entity.TomteRenderState;
 import io.github.ageuxo.TomteMod.entity.animation.TomteAnimationDefinitions;
 import net.minecraft.client.model.ArmedModel;
-import net.minecraft.client.model.HierarchicalModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.HumanoidArm;
-import org.joml.Vector3f;
 
-public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> implements ArmedModel {
+public class TomteModel extends EntityModel<TomteRenderState> implements ArmedModel {
 	private final ModelPart main;
 	private final ModelPart armLeft;
 	private final ModelPart armRight;
 
 
     public TomteModel(ModelPart root) {
-		this.main = root.getChild("main");
+        super(root);
+        this.main = root.getChild("main");
 		ModelPart arms = this.main.getChild("arms");
 		this.armLeft = arms.getChild("armLeft");
 		this.armRight = arms.getChild("armRight");
@@ -67,24 +66,14 @@ public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> implem
 	}
 
 	@Override
-	public void setupAnim(T entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+	public void setupAnim(TomteRenderState renderState) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 
-		this.animateWalk(TomteAnimationDefinitions.WALK_ANIM, limbSwing, limbSwingAmount, 2.0F, 2.5F);
-		this.animate(entity.idleAnimationState, TomteAnimationDefinitions.IDLE_ANIM, ageInTicks, 1.0F);
-		this.animate(entity.stealAnimationState, TomteAnimationDefinitions.STEAL_ANIM, ageInTicks, 1.0F);
-		this.animate(entity.attackAnimationState, TomteAnimationDefinitions.ATTACK_ANIM, ageInTicks, 1.0F);
-		this.animate(entity.eatAnimationState, TomteAnimationDefinitions.EAT_ANIM, ageInTicks, 1.0F);
-	}
-
-	@Override
-	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
-		main.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
-	}
-
-	@Override
-	public ModelPart root() {
-		return this.main;
+		this.animateWalk(TomteAnimationDefinitions.WALK_ANIM, renderState.walkAnimationPos, renderState.walkAnimationSpeed, renderState.walkAnimationSpeed, 2.5F);
+		this.animate(renderState.idleAnimationState, TomteAnimationDefinitions.IDLE_ANIM, renderState.ageInTicks, 1.0F);
+		this.animate(renderState.stealAnimationState, TomteAnimationDefinitions.STEAL_ANIM, renderState.ageInTicks, 1.0F);
+		this.animate(renderState.attackAnimationState, TomteAnimationDefinitions.ATTACK_ANIM, renderState.ageInTicks, 1.0F);
+		this.animate(renderState.eatAnimationState, TomteAnimationDefinitions.EAT_ANIM, renderState.ageInTicks, 1.0F);
 	}
 
 	@Override
@@ -95,7 +84,6 @@ public class TomteModel<T extends BaseTomte> extends HierarchicalModel<T> implem
 		} else {
 			arm = this.armRight;
 		}
-//		arm.offsetPos(new Vector3f(0.0F, 0.8F, 0.0F));
 		pPoseStack.scale(0.6F, 0.6F, 0.6F);
 		pPoseStack.translate(-0.3F, 1.6F, 0.0F);
 		arm.translateAndRotate(pPoseStack);

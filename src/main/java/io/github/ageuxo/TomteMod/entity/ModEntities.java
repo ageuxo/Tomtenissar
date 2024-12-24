@@ -1,20 +1,22 @@
 package io.github.ageuxo.TomteMod.entity;
 
 import io.github.ageuxo.TomteMod.TomteMod;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.MobCategory;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class ModEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES = DeferredRegister.create(Registries.ENTITY_TYPE, TomteMod.MODID);
 
-    public static final RegistryObject<EntityType<BaseTomte>> TOMTE = ENTITY_TYPES.register("tomte",
+    public static final DeferredHolder<EntityType<?>, EntityType<BaseTomte>> TOMTE = ENTITY_TYPES.register("tomte",
             ()->EntityType.Builder.of(BaseTomte::new, MobCategory.MISC)
                     .sized(0.5F, 0.75F)
-                    .build("tomte"));
+                    .build(ResourceKey.create(BuiltInRegistries.ENTITY_TYPE.key(), TomteMod.modRL("tomte"))));
 
     public static void register(IEventBus bus){
         ENTITY_TYPES.register(bus);

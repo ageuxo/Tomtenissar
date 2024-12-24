@@ -14,13 +14,13 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -30,7 +30,7 @@ import java.util.Optional;
 public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     private static final Logger LOGGER = LogUtils.getLogger();
     private static final int DELAY_TICKS = 260;
-    protected LazyOptional<IItemHandler> target;
+    protected IItemHandler target;
     protected BlockPos pos;
 
     public static final List<Pair<MemoryModuleType<?>, MemoryStatus>> MEMORY_REQUIREMENTS = ObjectArrayList.of(
@@ -50,7 +50,7 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     protected void start(E entity) {
         LOGGER.debug("Starting rummage behaviour");
         //TODO start animation here
-        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
+        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.location(), 32));
         super.start(entity);
     }
 
@@ -62,47 +62,45 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         LOGGER.debug("Checking extra req. for RummageBehaviour");
-        Pair<BlockPos, BlockEntityType<?>> pair = BrainUtils.getMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
+        Pair<BlockPos, BlockEntityType<?>> pair = BrainUtil.getMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
         if (pair == null) return false;
         Optional<? extends BlockEntity> optional = level.getBlockEntity(pair.getFirst(), pair.getSecond());
         if (pair.getFirst().getCenter().closerThan(entity.position(), 1.73D) && optional.isPresent()){
             BlockEntity blockEntity = optional.get();
-            LazyOptional<IItemHandler> cap = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER);
-            this.target = cap;
+            IItemHandler cap = level.getCapability(Capabilities.ItemHandler.BLOCK, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, entity.getDirection());
             this.pos = pair.getFirst();
-            return cap.isPresent();
+            return cap != null;
         }
         return false;
     }
 
     public void evaluateInventory(E entity){
-        if (this.target.isPresent()){
-            Optional<IItemHandler> optional = this.target.resolve();
-            if (optional.isPresent()){
-                IItemHandler itemHandler = optional.get();
-                int count = 0;
-                for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
-                    ItemStack stack = itemHandler.getStackInSlot(slot);
-                    if (stack.is(ModTags.STEALABLES)){
-                        count += stack.getCount();
-                    }
+        Level level = entity.level();
+        BlockEntity blockEntity = level.getBlockEntity(this.pos);
+        IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, entity.getDirection());
+        {
+            int count = 0;
+            for (int slot = 0; slot < itemHandler.getSlots(); slot++) {
+                ItemStack stack = itemHandler.getStackInSlot(slot);
+                if (stack.is(ModTags.STEALABLES)) {
+                    count += stack.getCount();
                 }
-                if (count > 0){
-                    Map<BlockPos, Integer> valuePosMap;
-                    if (BrainUtils.hasMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get())) {
-                        valuePosMap = BrainUtils.getMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get());
-                    } else {
-                        valuePosMap = new Object2IntArrayMap<>();
-                    }
-                    valuePosMap.put(this.pos, count);
-                    BrainUtils.setMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get(), valuePosMap);
+            }
+            if (count > 0) {
+                Map<BlockPos, Integer> valuePosMap;
+                if (BrainUtil.hasMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get())) {
+                    valuePosMap = BrainUtil.getMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get());
+                } else {
+                    valuePosMap = new Object2IntArrayMap<>();
                 }
+                valuePosMap.put(this.pos, count);
+                BrainUtil.setMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get(), valuePosMap);
             }
         }
     }
 
     @Override
     protected void stop(E entity) {
-        BrainUtils.clearMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
+        BrainUtil.clearMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
     }
 }

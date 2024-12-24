@@ -3,6 +3,7 @@ package io.github.ageuxo.TomteMod.entity.brain.behaviour;
 import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -11,7 +12,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.item.ItemStack;
 import net.tslat.smartbrainlib.api.core.behaviour.HeldBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -58,11 +59,11 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         ItemStack handItem = entity.getMainHandItem();
         if (handItem.isEmpty()){
-            BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
+            BrainUtil.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
             return false;
         }
-        LOGGER.trace( "extraCheck: {}, edible:{}", handItem, handItem.isEdible());
-        return handItem.isEdible() && !entity.isUsingItem();
+        boolean consumable = handItem.get(DataComponents.CONSUMABLE) != null;
+        return consumable && !entity.isUsingItem();
     }
 
     @Override
@@ -70,7 +71,7 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
         entity.startUsingItem(InteractionHand.MAIN_HAND);
         this.animationCallback.accept(true);
         this.eatingStack = entity.getItemBySlot(this.equipmentSlot);
-        this.runFor(e -> e.getItemBySlot(this.equipmentSlot).getUseDuration());
+        this.runFor(e -> e.getItemBySlot(this.equipmentSlot).getUseDuration(e));
     }
 
     @Override
@@ -85,7 +86,7 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
         this.eatingStack = null;
         LOGGER.trace( "finished");
         if (entity.getItemBySlot(this.equipmentSlot).isEmpty()){
-            BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
+            BrainUtil.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
         }
     }
 }

@@ -7,6 +7,7 @@ import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -14,15 +15,13 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
-import java.util.Optional;
 
 public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     private static final Logger LOGGER = LogUtils.getLogger();
@@ -52,7 +51,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     protected void start(E entity) {
         LOGGER.trace( "start");
         entity.setStealing(true);
-        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
+        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.location(), 32));
         super.start(entity);
     }
 
@@ -64,7 +63,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     @Override
     protected void stop(E entity) {
         entity.setStealing(false);
-        BrainUtils.clearMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
+        BrainUtil.clearMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
     }
 
     @Override
@@ -73,11 +72,11 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
             return false;
         } else if (entity.getMood() < 0){ //TODO tweak this
             LOGGER.trace( "checkExtraStartConditions, mood:{}", entity.getMood());
-            this.pos = BrainUtils.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
+            this.pos = BrainUtil.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
             this.lastCheck = level.getGameTime();
             boolean closeEnough = this.pos.closerToCenterThan(entity.position(), this.minDistance);
             if (!closeEnough){
-                BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.pos, 1f, 1));
+                BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.pos, 1f, 1));
             }
             return closeEnough;
         }
@@ -105,25 +104,23 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
 
     @SuppressWarnings("DataFlowIssue")
     public void stealFromContainer(E entity, BlockPos pos){
-        LazyOptional<IItemHandler> lazyOptional = entity.level().getBlockEntity(pos).getCapability(ForgeCapabilities.ITEM_HANDLER);
-        Optional<IItemHandler> optional = lazyOptional.resolve();
-        if (optional.isPresent()){
-            IItemHandler itemHandler = optional.get();
-            for (int i = 0; i < itemHandler.getSlots(); i++){
-                ItemStack stack = itemHandler.getStackInSlot(i);
-                if (stack.is(ModTags.STEALABLES)){
-                    int amount = Math.min(4, stack.getCount());
-                    int slot = stack.isEdible() ? 0 : 1;
-                    ItemStack stolen = itemHandler.extractItem(i, amount, true);
-                    int simInserted = entity.itemHandler.insertItem(slot, stolen, true).getCount();
-                    int simStolen = stolen.getCount();
-                    if (simInserted < simStolen){
-                        LOGGER.trace( "Stealing {}", stolen);
-                        stolen = itemHandler.extractItem(i, amount, false);
-                        entity.itemHandler.insertItem(slot, stolen, false);
-                        entity.addMood(stealableMoodValue, true);
-                        break;
-                    }
+        var level = entity.level();
+        var blockEntity = level.getBlockEntity(pos);
+        IItemHandler itemHandler = level.getCapability(Capabilities.ItemHandler.BLOCK, blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity, null);
+        for (int i = 0; i < itemHandler.getSlots(); i++){
+            ItemStack stack = itemHandler.getStackInSlot(i);
+            if (stack.is(ModTags.STEALABLES)){
+                int amount = Math.min(4, stack.getCount());
+                int slot = stack.get(DataComponents.CONSUMABLE) != null ? 0 : 1;
+                ItemStack stolen = itemHandler.extractItem(i, amount, true);
+                int simInserted = entity.itemHandler.insertItem(slot, stolen, true).getCount();
+                int simStolen = stolen.getCount();
+                if (simInserted < simStolen){
+                    LOGGER.trace( "Stealing {}", stolen);
+                    stolen = itemHandler.extractItem(i, amount, false);
+                    entity.itemHandler.insertItem(slot, stolen, false);
+                    entity.addMood(stealableMoodValue, true);
+                    break;
                 }
             }
         }

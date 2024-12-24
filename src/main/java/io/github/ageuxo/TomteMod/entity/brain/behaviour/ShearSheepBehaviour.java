@@ -13,7 +13,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.animal.Sheep;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, BaseTomte entity) {
-        LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        LivingEntity livingEntity = BrainUtil.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
         if (livingEntity instanceof Sheep sheep) {
             return entity.closerThan(sheep, 1.2D);
         }
@@ -49,15 +49,15 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
     protected void start(BaseTomte entity) {
         entity.setStealing(true);
         LOGGER.trace( "starting shearing");
-        BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
+        BrainUtil.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
     }
 
     @Override
     protected void doDelayedAction(BaseTomte entity) {
         LOGGER.trace( "delayed action");
-        BlockPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.SHEARING_STATION.get()).pos();
+        BlockPos pos = BrainUtil.getMemory(entity, ModMemoryTypes.SHEARING_STATION.get()).pos();
         BlockEntity be = entity.level().getBlockEntity(pos);
-        LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        LivingEntity livingEntity = BrainUtil.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
         if (be instanceof ShearingWorkStationBE shearingStation && livingEntity instanceof Sheep sheep){
             shearingStation.doAction(sheep);
         }
@@ -65,6 +65,6 @@ public class ShearSheepBehaviour extends DelayedBehaviour<BaseTomte> {
 
     @Override
     protected void stop(BaseTomte entity) {
-        BrainUtils.clearMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        BrainUtil.clearMemory(entity, MemoryModuleType.INTERACTION_TARGET);
     }
 }

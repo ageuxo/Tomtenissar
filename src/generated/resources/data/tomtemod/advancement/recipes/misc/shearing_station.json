@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_milk_bucket": {
+    "has_shears": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:milk_bucket"
-            ]
+            "items": "minecraft:shears"
           }
         ]
       },
@@ -15,21 +13,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "tomtemod:milking_station"
+        "recipe": "tomtemod:shearing_station"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_milk_bucket",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_shears"
     ]
   ],
   "rewards": {
     "recipes": [
-      "tomtemod:milking_station"
+      "tomtemod:shearing_station"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

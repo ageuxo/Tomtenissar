@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.minecraft.world.level.pathfinder.Node;
 import net.minecraft.world.level.pathfinder.Path;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -37,7 +37,7 @@ public class StayCloseToHomeBehaviour<E extends PathfinderMob> extends ExtendedB
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        GlobalPos memory = BrainUtils.getMemory(entity, MemoryModuleType.HOME);
+        GlobalPos memory = BrainUtil.getMemory(entity, MemoryModuleType.HOME);
         if (memory.dimension().equals(entity.level().dimension()) && memory.pos().closerToCenterThan(entity.position(), this.homeRadius)) {
             this.home = memory.pos();
             return true;
@@ -50,7 +50,7 @@ public class StayCloseToHomeBehaviour<E extends PathfinderMob> extends ExtendedB
         BlockPos pos = getPositionInRangeOfTarget(entity, this.home, (float) this.homeRadius);
         if (pos != null) {
             WalkTarget target = new WalkTarget(pos, 1.0f, 4);
-            BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, target);
+            BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, target);
         }
     }
 

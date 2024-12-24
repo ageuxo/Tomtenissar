@@ -3,7 +3,7 @@ package io.github.ageuxo.TomteMod.gui;
 import io.github.ageuxo.TomteMod.block.entity.workstations.ShearingWorkStationBE;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.items.SlotItemHandler;
+import net.neoforged.neoforge.items.SlotItemHandler;
 
 public class ShearingWorkStationMenu extends SimpleContainerMenu<ShearingWorkStationBE>{
 

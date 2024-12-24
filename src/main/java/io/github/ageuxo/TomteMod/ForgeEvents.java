@@ -2,13 +2,13 @@ package io.github.ageuxo.TomteMod;
 
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
-import net.minecraft.world.entity.MobSpawnType;
+import net.minecraft.world.entity.EntitySpawnReason;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.ServerLevelAccessor;
-import net.minecraftforge.event.ForgeEventFactory;
-import net.minecraftforge.event.level.SleepFinishedTimeEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.neoforge.event.EventHooks;
+import net.neoforged.neoforge.event.level.SleepFinishedTimeEvent;
 
 public class ForgeEvents {
     @SubscribeEvent
@@ -19,7 +19,7 @@ public class ForgeEvents {
 
         if (level.getEntitiesOfClass(BaseTomte.class, player.getBoundingBox().inflate(16)).isEmpty()){
             BaseTomte tomte = new BaseTomte(ModEntities.TOMTE.get(), player.level());
-            ForgeEventFactory.onFinalizeSpawn(tomte, (ServerLevelAccessor) level, level.getCurrentDifficultyAt(player.blockPosition()), MobSpawnType.EVENT, null, null);
+            EventHooks.finalizeMobSpawn(tomte, (ServerLevelAccessor) level, level.getCurrentDifficultyAt(player.blockPosition()), EntitySpawnReason.EVENT, null);
             level.addFreshEntity(tomte);
             tomte.setPos(player.position());
         }

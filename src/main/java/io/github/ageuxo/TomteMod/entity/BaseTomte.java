@@ -1,6 +1,5 @@
 package io.github.ageuxo.TomteMod.entity;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.ModPoiTypes;
 import io.github.ageuxo.TomteMod.ModTags;
@@ -10,6 +9,7 @@ import io.github.ageuxo.TomteMod.entity.brain.sensor.DummyDoorSensor;
 import io.github.ageuxo.TomteMod.item.ItemHelpers;
 import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import net.minecraft.core.GlobalPos;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
@@ -38,13 +38,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.pathfinder.NodeEvaluator;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.wrapper.EntityHandsInvWrapper;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.EntityHandsInvWrapper;
 import net.tslat.smartbrainlib.api.SmartBrainOwner;
 import net.tslat.smartbrainlib.api.core.BrainActivityGroup;
 import net.tslat.smartbrainlib.api.core.SmartBrainProvider;
@@ -69,7 +71,7 @@ import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearestItemSensor;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -85,6 +87,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
+    public final TomteRenderState tomteRenderState = new TomteRenderState();
 
     public IItemHandler itemHandler = new EntityHandsInvWrapper(this);
     private int mood = 0;
@@ -94,14 +97,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         super(pEntityType, pLevel);
         this.setCanPickUpLoot(true);
         this.animalDeathEventListener = new DynamicGameEventListener<>(new CustomGameEventListener<>(this, GameEvent.ENTITY_DIE, (tomte) -> this.addMood(-2, true), BaseTomte::deathGameEventFilter, 16));
-        this.setMaxUpStep(1.5f);
     }
-
-    public final AnimationState idleAnimationState = new AnimationState();
-    private int idleAnimationTimeout = 0;
-    public final AnimationState stealAnimationState = new AnimationState();
-    public final AnimationState attackAnimationState = new AnimationState();
-    public final AnimationState eatAnimationState = new AnimationState();
 
     @Override
     public void tick() {
@@ -113,16 +109,16 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
 
     private void setupAnimationStates(){
         // Idle
-        if (this.idleAnimationTimeout <= 0){
-            this.idleAnimationTimeout = this.getRandom().nextInt(40) + 80;
-            this.idleAnimationState.start(this.tickCount);
+        if (this.tomteRenderState.idleAnimationTimeout <= 0){
+            this.tomteRenderState.idleAnimationTimeout = this.getRandom().nextInt(40) + 80;
+            this.tomteRenderState.idleAnimationState.start(this.tickCount);
         } else {
-            --this.idleAnimationTimeout;
+            this.tomteRenderState.idleAnimationTimeout--;
         }
 
-        this.attackAnimationState.animateWhen(this.isAttacking(), tickCount);
-        this.stealAnimationState.animateWhen(this.isStealing(), tickCount);
-        this.eatAnimationState.animateWhen(this.isEating(), tickCount);
+        this.tomteRenderState.attackAnimationState.animateWhen(this.isAttacking(), tickCount);
+        this.tomteRenderState.stealAnimationState.animateWhen(this.isStealing(), tickCount);
+        this.tomteRenderState.eatAnimationState.animateWhen(this.isEating(), tickCount);
     }
 
     public static AttributeSupplier.Builder createAttributes(){
@@ -136,15 +132,16 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    protected void defineSynchedData() {
-        super.defineSynchedData();
-        this.entityData.define(ATTACKING, false);
-        this.entityData.define(STEALING, false);
-        this.entityData.define(EATING, false);
+    protected void defineSynchedData(SynchedEntityData.Builder builder) {
+        super.defineSynchedData(builder
+                .define(ATTACKING, false)
+                .define(STEALING, false)
+                .define(EATING, false)
+        );
     }
 
     @Override
-    protected void customServerAiStep() {
+    protected void customServerAiStep(ServerLevel level) {
         tickBrain(this);
     }
 
@@ -205,7 +202,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     private boolean huntEnemyTargetPredicate(LivingEntity entity) {
-        GlobalPos memory = BrainUtils.getMemory(this, MemoryModuleType.HOME);
+        GlobalPos memory = BrainUtil.getMemory(this, MemoryModuleType.HOME);
         return entity instanceof Enemy && !(entity instanceof Creeper)
                 && (entity.distanceToSqr(memory.pos().getCenter()) < 32);
     }
@@ -286,12 +283,12 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    public boolean hurt(DamageSource pSource, float pAmount) {
+    public boolean hurtServer(ServerLevel level, DamageSource pSource, float pAmount) {
         Entity entity = pSource.getEntity();
         if (entity instanceof Player){
             this.addMood(-5, true);
         }
-        return super.hurt(pSource, pAmount);
+        return super.hurtServer(level, pSource, pAmount);
     }
 
     @Override
@@ -323,7 +320,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    public boolean wantsToPickUp(ItemStack pStack) {
+    public boolean wantsToPickUp(ServerLevel level, ItemStack pStack) {
         return  ((pStack.is(ModTags.STEALABLES) || wantsToEat(pStack)) && canHoldItem(pStack));
     }
 
@@ -340,13 +337,13 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    protected void pickUpItem(ItemEntity pItemEntity) {
+    protected void pickUpItem(ServerLevel level, ItemEntity pItemEntity) {
         ItemStack stack = pItemEntity.getItem();
         if (stack.isEmpty()) return;
         InteractionHand hand = this.wantsToEat(stack) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
         int deltaCount = ItemHelpers.canStackHowMany(stack, this.getItemInHand(hand));
         if (deltaCount > 0){
-            this.setItemInHand(hand, ItemHandlerHelper.copyStackWithSize(stack, deltaCount));
+            this.setItemInHand(hand, stack.copyWithCount(deltaCount));
             this.onItemPickup(pItemEntity);
             this.take(pItemEntity, deltaCount);
             stack.shrink(deltaCount);
@@ -362,7 +359,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         ItemStack stack = pItemEntity.getItem();
         int mood = getMoodValueOfStack(stack);
         if (this.wantsToEat(stack)){
-            BrainUtils.setMemory(this, ModMemoryTypes.HAS_FOOD.get(), true);
+            BrainUtil.setMemory(this, ModMemoryTypes.HAS_FOOD.get(), true);
         }
         LOGGER.trace( "addMood: {}", mood);
         this.addMood(mood, true);
@@ -373,9 +370,9 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         if (stack.is(ModTags.STEALABLES)) {
             mood = stack.getCount() * 10;
         } else {
-            FoodProperties foodProperties = stack.getFoodProperties(this);
+            FoodProperties foodProperties = stack.get(DataComponents.FOOD);
             if (foodProperties != null) {
-                int foodValue = (int) ((foodProperties.getNutrition() * foodProperties.getSaturationModifier()) * stack.getCount());
+                int foodValue = (int) ((foodProperties.nutrition() * foodProperties.saturation()) * stack.getCount());
                 mood = foodValue * 4;
             }
         }
@@ -455,15 +452,21 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     public boolean wantsToEat(ItemStack stack){
-        if (stack.isEdible()) {
-            FoodProperties food = stack.getFoodProperties(this);
-            //noinspection DataFlowIssue
-            for (Pair<MobEffectInstance, Float> pair : food.getEffects()) {
-                if (pair.getFirst().getEffect().getCategory() == MobEffectCategory.HARMFUL){
-                    return false;
+        FoodProperties food = stack.get(DataComponents.FOOD);
+        if (food != null) {//noinspection DataFlowIssue
+            Consumable consumable = stack.get(DataComponents.CONSUMABLE);
+            if (consumable != null){
+                for (ConsumeEffect consumeEffect : consumable.onConsumeEffects()) {
+                    if (consumeEffect instanceof ApplyStatusEffectsConsumeEffect applyEffect) {
+                        for (var effect : applyEffect.effects()) {
+                            if (effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) {
+                                return false;
+                            }
+                        }
+                    }
                 }
             }
-            return (food.getNutrition() * food.getSaturationModifier()) > 2f;
+            return (food.nutrition() * food.saturation()) > 2f;
         }
         return false;
     }

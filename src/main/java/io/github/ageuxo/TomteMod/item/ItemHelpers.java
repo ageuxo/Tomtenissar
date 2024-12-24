@@ -7,11 +7,11 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 public class ItemHelpers {
     public static boolean canStack(ItemStack held, ItemStack into){
-        return into.isEmpty() || (ItemStack.isSameItemSameTags(into, held) && into.getCount() < into.getMaxStackSize());
+        return into.isEmpty() || (ItemStack.isSameItemSameComponents(into, held) && into.getCount() < into.getMaxStackSize());
     }
 
     public static int canStackHowMany(ItemStack held, ItemStack into){

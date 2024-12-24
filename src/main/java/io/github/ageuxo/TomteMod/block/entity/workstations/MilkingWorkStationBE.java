@@ -12,24 +12,23 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeMod;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.FluidType;
-import net.minecraftforge.fluids.FluidUtil;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.common.NeoForgeMod;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.FluidType;
+import net.neoforged.neoforge.fluids.FluidUtil;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.IFluidHandlerItem;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     public MilkingWorkStationBE(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.MILKING_STATION.get(), pPos, pBlockState, (animal -> animal instanceof Cow && !(animal instanceof MushroomCow)), 3, 5, 0);
-        this.wrappedHandler.setInsertFilter((integer, stack) -> stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().isPresent());
+        this.wrappedHandler.setInsertFilter((integer, stack) -> stack.getCapability(Capabilities.FluidHandler.ITEM) != null);
     }
 
     @Override
@@ -55,7 +54,7 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
     public void doAction(Cow cow){
         if (!this.level.isClientSide){
             int size = this.itemHandler.getSlots();
-            FluidStack stack = new FluidStack(ForgeMod.MILK.get(), 1000);
+            FluidStack stack = new FluidStack(NeoForgeMod.MILK.get(), 1000);
             for (int i = 0; i < size; i++){
                 if (this.itemHandler.getStackInSlot(i).is(Items.BUCKET)){
                     ItemStack filled = FluidUtil.getFilledBucket(stack);
@@ -64,10 +63,10 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
                         break;
                     }
                 } else if (fluidFitsInSlot(this.itemHandler, i, stack)){
-                    Optional<IFluidHandlerItem> handlerItem = this.itemHandler.getStackInSlot(i).getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
-                    if (handlerItem.isPresent()){
-                        handlerItem.get().fill(stack, IFluidHandler.FluidAction.EXECUTE);
-                        this.itemHandler.setStackInSlot(i, handlerItem.get().getContainer());
+                    IFluidHandlerItem handlerItem = this.itemHandler.getStackInSlot(i).getCapability(Capabilities.FluidHandler.ITEM);
+                    if (handlerItem != null){
+                        handlerItem.fill(stack, IFluidHandler.FluidAction.EXECUTE);
+                        this.itemHandler.setStackInSlot(i, handlerItem.getContainer());
                         break;
                     }
                 }
@@ -83,7 +82,7 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
     }
 
     protected boolean hasValidContainer() {
-        FluidStack fluidStack = new FluidStack(ForgeMod.MILK.get(), FluidType.BUCKET_VOLUME);
+        FluidStack fluidStack = new FluidStack(NeoForgeMod.MILK.get(), FluidType.BUCKET_VOLUME);
         for (int i = 0; i < this.getItemHandler().getSlots(); i++){
             if (fluidFitsInSlot(this.getItemHandler(), i, fluidStack)){
                 return true;
@@ -92,11 +91,10 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
         return false;
     }
 
-    protected boolean fluidFitsInSlot(IItemHandler itemHandler, int slot, FluidStack fluidStack){
-        Optional<IFluidHandlerItem> fluidItemOptional = itemHandler.getStackInSlot(slot).getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
-        //noinspection OptionalIsPresent
-        if (fluidItemOptional.isPresent()){
-            return fluidItemOptional.get().fill(fluidStack, IFluidHandler.FluidAction.SIMULATE) != 0;
+    protected boolean fluidFitsInSlot(IItemHandlerModifiable itemHandler, int slot, FluidStack fluidStack){
+        IFluidHandlerItem fluidCap = itemHandler.getStackInSlot(slot).getCapability(Capabilities.FluidHandler.ITEM);
+        if (fluidCap != null){
+            return fluidCap.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE) != 0;
         }
         return false;
     }

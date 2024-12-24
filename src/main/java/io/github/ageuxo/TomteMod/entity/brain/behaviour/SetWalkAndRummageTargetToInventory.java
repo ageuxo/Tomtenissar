@@ -11,11 +11,13 @@ import net.minecraft.world.entity.ai.behavior.BlockPosTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -31,14 +33,16 @@ public class SetWalkAndRummageTargetToInventory<E extends PathfinderMob> extends
             Pair.of(ModMemoryTypes.RUMMAGE_TARGET.get(), MemoryStatus.VALUE_ABSENT));
 
     protected Pair<BlockPos, BlockEntityType<?>> target;
-    protected BiPredicate<E, Pair<BlockPos, BlockEntityType<?>>> predicate = ((e, pair) -> {
+    protected BiPredicate<E, Pair<BlockPos, BlockEntityType<?>>> predicate = (e, pair) -> {
         Optional<? extends BlockEntity> optional = e.level().getBlockEntity(pair.getFirst(), pair.getSecond());
         if (optional.isPresent()){
             BlockEntity be = optional.get();
-            return be.getCapability(ForgeCapabilities.ITEM_HANDLER).isPresent();
+            Level level = be.getLevel();
+            IItemHandler cap = level.getCapability(Capabilities.ItemHandler.BLOCK, be.getBlockPos(), be.getBlockState(), be, null);
+            return cap != null;
         }
         return false;
-    });
+    };
     protected BiFunction<E, Pair<BlockPos, BlockEntityType<?>>, Float> speedModFunction = (e, pair) -> 1f;
     protected BiFunction<E, Pair<BlockPos, BlockEntityType<?>>, Integer> closeEnoughFunction = (e, pair) -> 1;
 
@@ -71,7 +75,7 @@ public class SetWalkAndRummageTargetToInventory<E extends PathfinderMob> extends
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         LOGGER.debug("Checking extra req. for SetWalkAndRummageTargetToInventory");
-        List<Pair<BlockPos, BlockEntityType<?>>> memory = BrainUtils.getMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
+        List<Pair<BlockPos, BlockEntityType<?>>> memory = BrainUtil.getMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
         if (memory != null){
             for (Pair<BlockPos, BlockEntityType<?>> pos : memory) {
                 if (this.predicate.test(entity, pos)){
@@ -87,8 +91,8 @@ public class SetWalkAndRummageTargetToInventory<E extends PathfinderMob> extends
     @Override
     protected void start(E entity) {
         LOGGER.debug("Setting rummage target to inventory at: {}", this.target.getFirst());
-        BrainUtils.setMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get(), this.target);
-        BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target.getFirst(), this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
-        BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, new BlockPosTracker(this.target.getFirst()));
+        BrainUtil.setMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get(), this.target);
+        BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target.getFirst(), this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
+        BrainUtil.setMemory(entity, MemoryModuleType.LOOK_TARGET, new BlockPosTracker(this.target.getFirst()));
     }
 }

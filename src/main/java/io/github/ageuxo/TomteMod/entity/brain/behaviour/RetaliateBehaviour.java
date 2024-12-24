@@ -9,7 +9,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.tslat.smartbrainlib.api.core.behaviour.custom.target.TargetOrRetaliate;
-import net.tslat.smartbrainlib.util.BrainUtils;
+import net.tslat.smartbrainlib.util.BrainUtil;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -28,7 +28,7 @@ public class RetaliateBehaviour<E extends Mob> extends TargetOrRetaliate<E> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E owner) {
-        this.toTarget = BrainUtils.getMemory(owner, MemoryModuleType.HURT_BY_ENTITY);
+        this.toTarget = BrainUtil.getMemory(owner, MemoryModuleType.HURT_BY_ENTITY);
         if (this.canAttackPredicate.test(this.toTarget)){
             if (this.alertAlliesPredicate.test(owner, this.toTarget)){
                 alertAllies(level, owner);
