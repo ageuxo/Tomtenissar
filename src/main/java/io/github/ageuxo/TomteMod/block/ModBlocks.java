@@ -7,7 +7,7 @@ import io.github.ageuxo.TomteMod.block.entity.workstations.ShearingWorkStationBE
 import io.github.ageuxo.TomteMod.gui.BlockEntityMenuConstructor;
 import io.github.ageuxo.TomteMod.gui.ShearingWorkStationMenu;
 import io.github.ageuxo.TomteMod.gui.MilkingWorkStationMenu;
-import io.github.ageuxo.TomteMod.item.BEWLRItem;
+import io.github.ageuxo.TomteMod.item.WorkStationItem;
 import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceKey;
@@ -28,8 +28,8 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(TomteMod.MODID);
 
-    public static final DeferredBlock<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new, ShearingWorkStationBE::new, BEWLRItem.Type.SHEARING);
-    public static final DeferredBlock<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new, BEWLRItem.Type.MILKING);
+    public static final DeferredBlock<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new, ShearingWorkStationBE::new, WorkStationItem.Type.SHEARING);
+    public static final DeferredBlock<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new, WorkStationItem.Type.MILKING);
 
     protected static <T extends Block> DeferredBlock<T> registerBlockWithItem(String name, Supplier<T> blockSupplier){
         DeferredBlock<T> ret = BLOCKS.register(name, blockSupplier);
@@ -37,14 +37,14 @@ public class ModBlocks {
         return ret;
     }
 
-    protected static <T extends AbstractAnimalWorkStation<?>> DeferredBlock<SimpleWorkStationBlock<T>> registerWorkStation(String baseName, BlockBehaviour.Properties properties, BlockEntityMenuConstructor<T> menuConstructor, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, BEWLRItem.Type bewlrType){
+    protected static <T extends AbstractAnimalWorkStation<?>> DeferredBlock<SimpleWorkStationBlock<T>> registerWorkStation(String baseName, BlockBehaviour.Properties properties, BlockEntityMenuConstructor<T> menuConstructor, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, WorkStationItem.Type bewlrType){
         String fullName = baseName + "_station";
         return registerBlockWithBEWLRItem(fullName, bewlrType, ()->new SimpleWorkStationBlock<>(properties.setId(ResourceKey.create(Registries.BLOCK, TomteMod.modRL(fullName))), menuConstructor, blockEntitySupplier));
     }
 
-    protected static <T extends Block> DeferredBlock<T> registerBlockWithBEWLRItem(String name, BEWLRItem.Type bewlrType, Supplier<T> blockSupplier){
+    protected static <T extends Block> DeferredBlock<T> registerBlockWithBEWLRItem(String name, WorkStationItem.Type bewlrType, Supplier<T> blockSupplier){
         DeferredBlock<T> ret = BLOCKS.register(name, blockSupplier);
-        ModItems.ITEMS.register(name, () -> new BEWLRItem(ret.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TomteMod.modRL(name))), bewlrType));
+        ModItems.ITEMS.register(name, () -> new WorkStationItem(ret.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TomteMod.modRL(name))), bewlrType));
         return ret;
     }
 

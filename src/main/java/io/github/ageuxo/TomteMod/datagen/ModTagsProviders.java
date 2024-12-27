@@ -12,23 +12,21 @@ import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.world.entity.ai.village.poi.PoiType;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.common.data.BlockTagsProvider;
-import net.neoforged.neoforge.common.data.ExistingFileHelper;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
 public class ModTagsProviders{
 
-    public static void addAll(DataGenerator generator, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookup, @Nullable ExistingFileHelper fileHelper){
-        var blockTags = generator.addProvider(true, new BlockTags(packOutput, lookup, fileHelper));
-        generator.addProvider(true, new ItemTags(packOutput, lookup, blockTags.contentsGetter(), fileHelper));
-        generator.addProvider(true, new PoiTags(packOutput, lookup, fileHelper));
+    public static void addAll(DataGenerator generator, PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookup){
+        var blockTags = generator.addProvider(true, new BlockTags(packOutput, lookup));
+        generator.addProvider(true, new ItemTags(packOutput, lookup, blockTags.contentsGetter()));
+        generator.addProvider(true, new PoiTags(packOutput, lookup));
     }
 
     public static class ItemTags extends ItemTagsProvider {
 
-        public ItemTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider, CompletableFuture<TagLookup<Block>> pBlockTags, @Nullable ExistingFileHelper existingFileHelper) {
-            super(pOutput, pLookupProvider, pBlockTags, TomteMod.MODID, existingFileHelper);
+        public ItemTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider, CompletableFuture<TagLookup<Block>> pBlockTags) {
+            super(pOutput, pLookupProvider, pBlockTags, TomteMod.MODID, null);
         }
 
         @Override
@@ -39,8 +37,8 @@ public class ModTagsProviders{
 
     public static class BlockTags extends BlockTagsProvider {
 
-        public BlockTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-            super(pOutput, pLookupProvider, TomteMod.MODID, existingFileHelper);
+        public BlockTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider) {
+            super(pOutput, pLookupProvider, TomteMod.MODID, null);
         }
 
         @Override
@@ -51,8 +49,8 @@ public class ModTagsProviders{
 
     public static class PoiTags extends TagsProvider<PoiType> {
 
-        protected PoiTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider, @Nullable ExistingFileHelper existingFileHelper) {
-            super(pOutput, Registries.POINT_OF_INTEREST_TYPE, pLookupProvider, TomteMod.MODID, existingFileHelper);
+        protected PoiTags(PackOutput pOutput, CompletableFuture<HolderLookup.Provider> pLookupProvider) {
+            super(pOutput, Registries.POINT_OF_INTEREST_TYPE, pLookupProvider, TomteMod.MODID, null);
         }
 
         @Override

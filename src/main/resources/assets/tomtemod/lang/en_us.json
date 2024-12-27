@@ -6,5 +6,7 @@
   "entity.tomtemod.tomte": "Tomte",
   "block.tomtemod.milking_station": "Milking workstation",
   "block.tomtemod.shearing_station": "Shearing workstation",
+  "item.tomtemod.milking_station": "Milking workstation",
+  "item.tomtemod.shearing_station": "Shearing workstation",
   "item.tomtemod.tomte_egg": "Tomte Egg"
 }

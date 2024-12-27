@@ -4,6 +4,7 @@ import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationRenderer;
+import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkstationSpecialRenderer;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -23,6 +24,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.slf4j.Logger;
@@ -71,6 +73,11 @@ public class TomteMod {
         public static void registerMenuScreens(RegisterMenuScreensEvent event) {
             event.register(ModMenuTypes.WORK_STATION.get(), SimpleContainerScreen::new);
             event.register(ModMenuTypes.SHEARING_STATION.get(), ShearingStationScreen::new);
+        }
+
+        @SubscribeEvent
+        public static void registerSpecialRenderers(RegisterSpecialModelRendererEvent event) {
+            event.register(AnimalWorkstationSpecialRenderer.ID, AnimalWorkstationSpecialRenderer.Unbaked.MAP_CODEC);
         }
     }
 }

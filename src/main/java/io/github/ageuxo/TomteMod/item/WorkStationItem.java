@@ -9,9 +9,11 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
-public class BEWLRItem extends BlockItem {
+import java.util.function.Supplier;
+
+public class WorkStationItem extends BlockItem {
     private final Type type;
-    public BEWLRItem(Block block, Properties pProperties, Type type) {
+    public WorkStationItem(Block block, Properties pProperties, Type type) {
         super(block, pProperties);
         this.type = type;
     }
@@ -21,13 +23,13 @@ public class BEWLRItem extends BlockItem {
     }
 
     public enum Type{
-        SHEARING(Items.SHEARS, ModBlocks.SHEARING_WORK_STATION),
-        MILKING(Items.MILK_BUCKET, ModBlocks.MILKING_WORK_STATION);
+        SHEARING(Items.SHEARS, ()->ModBlocks.SHEARING_WORK_STATION),
+        MILKING(Items.BUCKET, ()->ModBlocks.MILKING_WORK_STATION);
 
         private final Item displayItem;
-        private final DeferredBlock<? extends SimpleWorkStationBlock<?>> block;
+        private final Supplier<DeferredBlock<? extends SimpleWorkStationBlock<?>>> block;
 
-        Type(Item displayItem, DeferredBlock<? extends SimpleWorkStationBlock<?>> block) {
+        Type(Item displayItem, Supplier<DeferredBlock<? extends SimpleWorkStationBlock<?>>> block) {
             this.displayItem = displayItem;
             this.block = block;
         }
@@ -37,10 +39,10 @@ public class BEWLRItem extends BlockItem {
         }
 
         public DeferredBlock<? extends SimpleWorkStationBlock<?>> block() {
-            return block;
+            return block.get();
         }
 
-        public static final Codec<Type> CODEC = Codec.STRING.xmap(Type::valueOf, Type::name);
+        public static final Codec<Type> CODEC = Codec.stringResolver(Type::name, Type::valueOf);
     }
 
 }

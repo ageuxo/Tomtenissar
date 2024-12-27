@@ -1,0 +1,10 @@
+{
+  "model": {
+    "type": "minecraft:special",
+    "base": "tomtemod:item/work_station",
+    "model": {
+      "type": "tomtemod:workstation",
+      "station_type": "SHEARING"
+    }
+  }
+}

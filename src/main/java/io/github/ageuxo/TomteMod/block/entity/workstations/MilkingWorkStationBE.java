@@ -2,6 +2,7 @@ package io.github.ageuxo.TomteMod.block.entity.workstations;
 
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.gui.MilkingWorkStationMenu;
+import io.github.ageuxo.TomteMod.item.WorkStationItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.animal.Cow;
@@ -48,7 +49,7 @@ public class MilkingWorkStationBE extends AbstractAnimalWorkStation<Cow> {
 
     @Override
     public ItemStack getDisplayItem() {
-        return Items.MILK_BUCKET.getDefaultInstance();
+        return WorkStationItem.Type.MILKING.displayItem().getDefaultInstance();
     }
 
     public void doAction(Cow cow){

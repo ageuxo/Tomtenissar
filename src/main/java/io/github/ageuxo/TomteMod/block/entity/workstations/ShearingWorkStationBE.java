@@ -3,6 +3,7 @@ package io.github.ageuxo.TomteMod.block.entity.workstations;
 import com.mojang.authlib.GameProfile;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.gui.ShearingWorkStationMenu;
+import io.github.ageuxo.TomteMod.item.WorkStationItem;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +13,6 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.ShearsItem;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.common.util.FakePlayer;
@@ -53,7 +53,7 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
 
     @Override
     public ItemStack getDisplayItem() {
-        return Items.SHEARS.getDefaultInstance();
+        return WorkStationItem.Type.SHEARING.displayItem().getDefaultInstance();
     }
 
     @Override
