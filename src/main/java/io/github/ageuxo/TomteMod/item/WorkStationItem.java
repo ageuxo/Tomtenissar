@@ -3,12 +3,15 @@ package io.github.ageuxo.TomteMod.item;
 import com.mojang.serialization.Codec;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.SimpleWorkStationBlock;
+import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationItemRenderer;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
+import java.util.function.Consumer;
 import java.util.function.Supplier;
 
 public class WorkStationItem extends BlockItem {

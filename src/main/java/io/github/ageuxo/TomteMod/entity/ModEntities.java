@@ -16,7 +16,7 @@ public class ModEntities {
     public static final DeferredHolder<EntityType<?>, EntityType<BaseTomte>> TOMTE = ENTITY_TYPES.register("tomte",
             ()->EntityType.Builder.of(BaseTomte::new, MobCategory.MISC)
                     .sized(0.5F, 0.75F)
-                    .build(ResourceKey.create(BuiltInRegistries.ENTITY_TYPE.key(), TomteMod.modRL("tomte"))));
+                    .build("tomte"));
 
     public static void register(IEventBus bus){
         ENTITY_TYPES.register(bus);

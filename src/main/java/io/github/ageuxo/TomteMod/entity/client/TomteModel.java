@@ -4,23 +4,26 @@ package io.github.ageuxo.TomteMod.entity.client;// Made with Blockbench 4.9.1
 
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.TomteRenderState;
 import io.github.ageuxo.TomteMod.entity.animation.TomteAnimationDefinitions;
 import net.minecraft.client.model.ArmedModel;
-import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.world.entity.HumanoidArm;
 
-public class TomteModel extends EntityModel<TomteRenderState> implements ArmedModel {
+public class TomteModel extends HierarchicalModel<BaseTomte> implements ArmedModel {
+	private final ModelPart root;
 	private final ModelPart main;
 	private final ModelPart armLeft;
 	private final ModelPart armRight;
 
 
     public TomteModel(ModelPart root) {
-        super(root);
+        this.root = root;
         this.main = root.getChild("main");
 		ModelPart arms = this.main.getChild("arms");
 		this.armLeft = arms.getChild("armLeft");
@@ -66,14 +69,25 @@ public class TomteModel extends EntityModel<TomteRenderState> implements ArmedMo
 	}
 
 	@Override
-	public void setupAnim(TomteRenderState renderState) {
-		this.root().getAllParts().forEach(ModelPart::resetPose);
+	public void setupAnim(BaseTomte tomte, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
+		this.root.getAllParts().forEach(ModelPart::resetPose);
+        TomteRenderState renderState = tomte.tomteRenderState;
+		this.animateWalk(TomteAnimationDefinitions.WALK_ANIM, limbSwing, limbSwingAmount, 2.0F, 2.5F);
+		this.animate(renderState.idleAnimationState, TomteAnimationDefinitions.IDLE_ANIM, tomte.tickCount, 1.0F);
+		this.animate(renderState.stealAnimationState, TomteAnimationDefinitions.STEAL_ANIM, tomte.tickCount, 1.0F);
+		this.animate(renderState.attackAnimationState, TomteAnimationDefinitions.ATTACK_ANIM, tomte.tickCount, 1.0F);
+		this.animate(renderState.eatAnimationState, TomteAnimationDefinitions.EAT_ANIM, tomte.tickCount, 1.0F);
+	}
 
-		this.animateWalk(TomteAnimationDefinitions.WALK_ANIM, renderState.walkAnimationPos, renderState.walkAnimationSpeed, renderState.walkAnimationSpeed, 2.5F);
-		this.animate(renderState.idleAnimationState, TomteAnimationDefinitions.IDLE_ANIM, renderState.ageInTicks, 1.0F);
-		this.animate(renderState.stealAnimationState, TomteAnimationDefinitions.STEAL_ANIM, renderState.ageInTicks, 1.0F);
-		this.animate(renderState.attackAnimationState, TomteAnimationDefinitions.ATTACK_ANIM, renderState.ageInTicks, 1.0F);
-		this.animate(renderState.eatAnimationState, TomteAnimationDefinitions.EAT_ANIM, renderState.ageInTicks, 1.0F);
+
+	@Override
+	public void renderToBuffer(PoseStack poseStack, VertexConsumer buffer, int packedLight, int packedOverlay, int color) {
+		main.render(poseStack, buffer, packedLight, packedOverlay, color);
+	}
+
+	@Override
+	public ModelPart root() {
+		return this.main;
 	}
 
 	@Override

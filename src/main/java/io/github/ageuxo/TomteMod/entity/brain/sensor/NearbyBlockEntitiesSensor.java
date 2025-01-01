@@ -18,7 +18,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.tslat.smartbrainlib.api.core.sensor.ExtendedSensor;
 import net.tslat.smartbrainlib.api.core.sensor.PredicateSensor;
 import net.tslat.smartbrainlib.object.SquareRadius;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 
 import java.util.List;
 import java.util.function.BiPredicate;
@@ -63,9 +63,9 @@ public class NearbyBlockEntitiesSensor<E extends LivingEntity> extends Predicate
             }
         }
         if (pairList.isEmpty()){
-            BrainUtil.clearMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
+            BrainUtils.clearMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
         } else {
-            BrainUtil.setMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get(), pairList);
+            BrainUtils.setMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get(), pairList);
         }
     }
 

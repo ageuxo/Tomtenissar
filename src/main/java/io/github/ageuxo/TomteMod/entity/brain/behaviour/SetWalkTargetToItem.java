@@ -5,7 +5,7 @@ import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 
 import java.util.List;
 
@@ -28,6 +28,6 @@ public class SetWalkTargetToItem<E extends Mob> extends AbstractSetWalkTargetBeh
     @Override
     protected void start(E entity) {
         super.start(entity);
-        BrainUtil.setForgettableMemory(entity, MemoryModuleType.IS_TEMPTED, true, entity.getRandom().nextInt(20, 60));
+        BrainUtils.setForgettableMemory(entity, MemoryModuleType.IS_TEMPTED, true, entity.getRandom().nextInt(20, 60));
     }
 }

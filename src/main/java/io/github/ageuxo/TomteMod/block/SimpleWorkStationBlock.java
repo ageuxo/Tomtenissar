@@ -1,7 +1,5 @@
 package io.github.ageuxo.TomteMod.block;
 
-import com.mojang.serialization.MapCodec;
-import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.github.ageuxo.TomteMod.block.entity.workstations.AbstractAnimalWorkStation;
 import io.github.ageuxo.TomteMod.gui.BlockEntityMenuConstructor;
 import io.github.ageuxo.TomteMod.gui.NameableBEMenuProvider;
@@ -11,6 +9,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -80,15 +79,15 @@ public class SimpleWorkStationBlock<S extends AbstractAnimalWorkStation<?>> exte
     }
 
     @Override
-    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer) {
             if (level.getBlockEntity(pos) instanceof AbstractAnimalWorkStation<?> workStation) {
                 if (serverPlayer.openMenu(workStation, buf -> buf.writeBlockPos(pos)).isPresent()) {
-                    return InteractionResult.SUCCESS;
+                    return ItemInteractionResult.SUCCESS;
                 }
             }
         }
-        return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
+        return ItemInteractionResult.CONSUME;
     }
 
     @Override

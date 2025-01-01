@@ -66,7 +66,7 @@ public class ShearingWorkStationBE extends AbstractAnimalWorkStation<Sheep> {
                 for (ItemStack drop : drops){
                     ItemStack remainder = ItemHandlerHelper.insertItemStacked(this.wrappedHandler, drop, false);
                     if (!remainder.isEmpty()){ // Drop on ground if it doesn't fit into the inventory
-                        sheep.spawnAtLocation((ServerLevel) this.level, remainder);
+                        sheep.spawnAtLocation(remainder);
                     }
                 }
             }

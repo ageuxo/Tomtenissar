@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -50,7 +50,7 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     protected void start(E entity) {
         LOGGER.debug("Starting rummage behaviour");
         //TODO start animation here
-        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.location(), 32));
+        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
         super.start(entity);
     }
 
@@ -62,7 +62,7 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         LOGGER.debug("Checking extra req. for RummageBehaviour");
-        Pair<BlockPos, BlockEntityType<?>> pair = BrainUtil.getMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
+        Pair<BlockPos, BlockEntityType<?>> pair = BrainUtils.getMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
         if (pair == null) return false;
         Optional<? extends BlockEntity> optional = level.getBlockEntity(pair.getFirst(), pair.getSecond());
         if (pair.getFirst().getCenter().closerThan(entity.position(), 1.73D) && optional.isPresent()){
@@ -88,19 +88,19 @@ public class RummageBehaviour<E extends BaseTomte> extends DelayedBehaviour<E> {
             }
             if (count > 0) {
                 Map<BlockPos, Integer> valuePosMap;
-                if (BrainUtil.hasMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get())) {
-                    valuePosMap = BrainUtil.getMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get());
+                if (BrainUtils.hasMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get())) {
+                    valuePosMap = BrainUtils.getMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get());
                 } else {
                     valuePosMap = new Object2IntArrayMap<>();
                 }
                 valuePosMap.put(this.pos, count);
-                BrainUtil.setMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get(), valuePosMap);
+                BrainUtils.setMemory(entity, ModMemoryTypes.ITEM_VALUE_POS.get(), valuePosMap);
             }
         }
     }
 
     @Override
     protected void stop(E entity) {
-        BrainUtil.clearMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
+        BrainUtils.clearMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get());
     }
 }

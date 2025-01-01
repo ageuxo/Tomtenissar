@@ -17,12 +17,12 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.CompletableFuture;
 
 public class ModRecipeProvider extends RecipeProvider {
-    public ModRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-        super(registries, output);
+    public ModRecipeProvider(PackOutput output , CompletableFuture<HolderLookup.Provider> registries) {
+        super(output, registries);
     }
 
     @Override
-    protected void buildRecipes() {
+    protected void buildRecipes(RecipeOutput output) {
         shaped(ModBlocks.MILKING_WORK_STATION.asItem(), RecipeCategory.MISC)
                 .define('C', Blocks.CRAFTING_TABLE.asItem())
                 .define('M', Items.MILK_BUCKET)
@@ -43,23 +43,6 @@ public class ModRecipeProvider extends RecipeProvider {
     }
 
     private @NotNull ShapedRecipeBuilder shaped(ItemLike result, @SuppressWarnings("SameParameterValue") RecipeCategory category) {
-        return ShapedRecipeBuilder.shaped(registries.lookupOrThrow(BuiltInRegistries.ITEM.key()), category, result);
-    }
-
-    public static class Runner extends RecipeProvider.Runner {
-
-        public Runner(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> registries) {
-            super(packOutput, registries);
-        }
-
-        @Override
-        protected RecipeProvider createRecipeProvider(HolderLookup.Provider registries, RecipeOutput output) {
-            return new ModRecipeProvider(registries, output);
-        }
-
-        @Override
-        public String getName() {
-            return "ModRecipes";
-        }
+        return ShapedRecipeBuilder.shaped(category, result);
     }
 }

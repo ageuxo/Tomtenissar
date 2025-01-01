@@ -17,6 +17,8 @@ public class ShearingStationScreen extends SimpleContainerScreen{
     @Override
     public void renderExtraSlot(GuiGraphics guiGraphics, Slot slot) {
         super.renderExtraSlot(guiGraphics, slot);
-        guiGraphics.blit(RenderType.GUI_TEXTURED, SHEARS, slot.x + this.leftPos, slot.y + this.topPos, 0f, 0f, 16, 16, 16, 16, 0xAA000000);
+        guiGraphics.setColor(0f, 0f, 0f, 0.3f);
+        guiGraphics.blit(SHEARS, slot.x + this.leftPos, slot.y + this.topPos, 0, 0, 16, 16, 16, 16);
+        guiGraphics.setColor(1f, 1f, 1f, 1f);
     }
 }

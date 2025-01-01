@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.animal.Sheep;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBeha
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        GlobalPos pos = BrainUtil.getMemory(entity, ModMemoryTypes.SHEARING_STATION.get());
+        GlobalPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.SHEARING_STATION.get());
         if (pos.dimension() == entity.level().dimension()){
             if (level.getBlockEntity(pos.pos()) instanceof ShearingWorkStationBE shearingWorkStationBE){
                 if (shearingWorkStationBE.canBeWorkedAt()){
@@ -48,7 +48,7 @@ public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBeha
                 LOGGER.trace( "Position is not shearing station: {}", pos.pos());
             }
         }
-        BrainUtil.clearMemory(entity, ModMemoryTypes.SHEARING_STATION.get());
+        BrainUtils.clearMemory(entity, ModMemoryTypes.SHEARING_STATION.get());
         return false;
     }
 
@@ -57,7 +57,7 @@ public class FindShearableBehaviour<E extends LivingEntity> extends ExtendedBeha
         List<Sheep> sheepList = this.shearingStation.getWorkableAnimals();
         if (!sheepList.isEmpty()){
             Sheep sheep = sheepList.get(entity.getRandom().nextInt(sheepList.size()));
-            BrainUtil.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, sheep);
+            BrainUtils.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, sheep);
         } else {
             LOGGER.trace( "No valid target in sheepList");
         }

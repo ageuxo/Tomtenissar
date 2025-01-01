@@ -39,17 +39,17 @@ public class ModBlocks {
 
     protected static <T extends AbstractAnimalWorkStation<?>> DeferredBlock<SimpleWorkStationBlock<T>> registerWorkStation(String baseName, BlockBehaviour.Properties properties, BlockEntityMenuConstructor<T> menuConstructor, BlockEntityType.BlockEntitySupplier<T> blockEntitySupplier, WorkStationItem.Type bewlrType){
         String fullName = baseName + "_station";
-        return registerBlockWithBEWLRItem(fullName, bewlrType, ()->new SimpleWorkStationBlock<>(properties.setId(ResourceKey.create(Registries.BLOCK, TomteMod.modRL(fullName))), menuConstructor, blockEntitySupplier));
+        return registerBlockWithBEWLRItem(fullName, bewlrType, ()->new SimpleWorkStationBlock<>(properties, menuConstructor, blockEntitySupplier));
     }
 
     protected static <T extends Block> DeferredBlock<T> registerBlockWithBEWLRItem(String name, WorkStationItem.Type bewlrType, Supplier<T> blockSupplier){
         DeferredBlock<T> ret = BLOCKS.register(name, blockSupplier);
-        ModItems.ITEMS.register(name, () -> new WorkStationItem(ret.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TomteMod.modRL(name))), bewlrType));
+        ModItems.ITEMS.register(name, () -> new WorkStationItem(ret.get(), new Item.Properties(), bewlrType));
         return ret;
     }
 
     private static <T extends Block> void registerBlockItem(String name, DeferredBlock<T> block){
-        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties().setId(ResourceKey.create(Registries.ITEM, TomteMod.modRL(name)))));
+        ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
     public static void register(IEventBus bus){

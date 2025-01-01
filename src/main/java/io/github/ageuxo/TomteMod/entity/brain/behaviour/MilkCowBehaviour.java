@@ -14,7 +14,7 @@ import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.animal.Cow;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -38,7 +38,7 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, BaseTomte entity) {
-        LivingEntity livingEntity = BrainUtil.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
         if (livingEntity instanceof Cow cow) {
             return entity.closerThan(cow, 1.2D);
         }
@@ -49,27 +49,27 @@ public class MilkCowBehaviour extends DelayedBehaviour<BaseTomte> {
     @Override
     protected void start(BaseTomte entity) {
         entity.setStealing(true); // start animation
-        entity.playSound(SoundEvents.GENERIC_DRINK.value());
+        entity.playSound(SoundEvents.GENERIC_DRINK);
         LOGGER.trace( "starting milking");
-        BrainUtil.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
+        BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 20);
     }
 
     @Override
     protected void doDelayedAction(BaseTomte entity) {
         LOGGER.trace( "delayed action");
-        BlockPos pos = BrainUtil.getMemory(entity, ModMemoryTypes.MILKING_STATION.get()).pos();
+        BlockPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.MILKING_STATION.get()).pos();
         BlockEntity be = entity.level().getBlockEntity(pos);
-        LivingEntity livingEntity = BrainUtil.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        LivingEntity livingEntity = BrainUtils.getMemory(entity, MemoryModuleType.INTERACTION_TARGET);
         if (be instanceof MilkingWorkStationBE milkStation && livingEntity instanceof Cow cow){
             milkStation.doAction(cow);
             entity.playSound(SoundEvents.COW_MILK);
-            BrainUtil.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 40);
+            BrainUtils.setForgettableMemory(entity, ModMemoryTypes.CHORE_COOLDOWN.get(), true, 40);
             LOGGER.trace( "milked and cooling down");
         }
     }
 
     @Override
     protected void stop(BaseTomte entity) {
-        BrainUtil.clearMemory(entity, MemoryModuleType.INTERACTION_TARGET);
+        BrainUtils.clearMemory(entity, MemoryModuleType.INTERACTION_TARGET);
     }
 }

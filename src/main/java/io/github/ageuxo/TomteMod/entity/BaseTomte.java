@@ -38,9 +38,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.schedule.Activity;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.Consumable;
-import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
-import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.gameevent.DynamicGameEventListener;
 import net.minecraft.world.level.gameevent.GameEvent;
@@ -71,7 +68,7 @@ import net.tslat.smartbrainlib.api.core.sensor.custom.NearbyBlocksSensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.HurtBySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearbyLivingEntitySensor;
 import net.tslat.smartbrainlib.api.core.sensor.vanilla.NearestItemSensor;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
@@ -141,7 +138,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    protected void customServerAiStep(ServerLevel level) {
+    protected void customServerAiStep() {
         tickBrain(this);
     }
 
@@ -202,7 +199,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     private boolean huntEnemyTargetPredicate(LivingEntity entity) {
-        GlobalPos memory = BrainUtil.getMemory(this, MemoryModuleType.HOME);
+        GlobalPos memory = BrainUtils.getMemory(this, MemoryModuleType.HOME);
         return entity instanceof Enemy && !(entity instanceof Creeper)
                 && (entity.distanceToSqr(memory.pos().getCenter()) < 32);
     }
@@ -283,12 +280,12 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    public boolean hurtServer(ServerLevel level, DamageSource pSource, float pAmount) {
+    public boolean hurt(DamageSource pSource, float pAmount) {
         Entity entity = pSource.getEntity();
         if (entity instanceof Player){
             this.addMood(-5, true);
         }
-        return super.hurtServer(level, pSource, pAmount);
+        return super.hurt(pSource, pAmount);
     }
 
     @Override
@@ -320,7 +317,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    public boolean wantsToPickUp(ServerLevel level, ItemStack pStack) {
+    public boolean wantsToPickUp(ItemStack pStack) {
         return  ((pStack.is(ModTags.STEALABLES) || wantsToEat(pStack)) && canHoldItem(pStack));
     }
 
@@ -337,7 +334,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     }
 
     @Override
-    protected void pickUpItem(ServerLevel level, ItemEntity pItemEntity) {
+    protected void pickUpItem(ItemEntity pItemEntity) {
         ItemStack stack = pItemEntity.getItem();
         if (stack.isEmpty()) return;
         InteractionHand hand = this.wantsToEat(stack) ? InteractionHand.MAIN_HAND : InteractionHand.OFF_HAND;
@@ -359,7 +356,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
         ItemStack stack = pItemEntity.getItem();
         int mood = getMoodValueOfStack(stack);
         if (this.wantsToEat(stack)){
-            BrainUtil.setMemory(this, ModMemoryTypes.HAS_FOOD.get(), true);
+            BrainUtils.setMemory(this, ModMemoryTypes.HAS_FOOD.get(), true);
         }
         LOGGER.trace( "addMood: {}", mood);
         this.addMood(mood, true);
@@ -454,16 +451,10 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
     public boolean wantsToEat(ItemStack stack){
         FoodProperties food = stack.get(DataComponents.FOOD);
         if (food != null) {//noinspection DataFlowIssue
-            Consumable consumable = stack.get(DataComponents.CONSUMABLE);
-            if (consumable != null){
-                for (ConsumeEffect consumeEffect : consumable.onConsumeEffects()) {
-                    if (consumeEffect instanceof ApplyStatusEffectsConsumeEffect applyEffect) {
-                        for (var effect : applyEffect.effects()) {
-                            if (effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) {
-                                return false;
-                            }
-                        }
-                    }
+            for (FoodProperties.PossibleEffect consumeEffect : food.effects()) {
+                MobEffectInstance effect = consumeEffect.effect();
+                if (effect.getEffect().value().getCategory() == MobEffectCategory.HARMFUL) {
+                    return false;
                 }
             }
             return (food.nutrition() * food.saturation()) > 2f;

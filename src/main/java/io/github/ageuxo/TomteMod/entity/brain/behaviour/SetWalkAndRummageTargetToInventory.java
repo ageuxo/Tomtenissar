@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -75,7 +75,7 @@ public class SetWalkAndRummageTargetToInventory<E extends PathfinderMob> extends
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         LOGGER.debug("Checking extra req. for SetWalkAndRummageTargetToInventory");
-        List<Pair<BlockPos, BlockEntityType<?>>> memory = BrainUtil.getMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
+        List<Pair<BlockPos, BlockEntityType<?>>> memory = BrainUtils.getMemory(entity, ModMemoryTypes.NEARBY_BLOCK_ENTITIES.get());
         if (memory != null){
             for (Pair<BlockPos, BlockEntityType<?>> pos : memory) {
                 if (this.predicate.test(entity, pos)){
@@ -91,8 +91,8 @@ public class SetWalkAndRummageTargetToInventory<E extends PathfinderMob> extends
     @Override
     protected void start(E entity) {
         LOGGER.debug("Setting rummage target to inventory at: {}", this.target.getFirst());
-        BrainUtil.setMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get(), this.target);
-        BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target.getFirst(), this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
-        BrainUtil.setMemory(entity, MemoryModuleType.LOOK_TARGET, new BlockPosTracker(this.target.getFirst()));
+        BrainUtils.setMemory(entity, ModMemoryTypes.RUMMAGE_TARGET.get(), this.target);
+        BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target.getFirst(), this.speedModFunction.apply(entity, this.target), this.closeEnoughFunction.apply(entity, this.target)));
+        BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, new BlockPosTracker(this.target.getFirst()));
     }
 }

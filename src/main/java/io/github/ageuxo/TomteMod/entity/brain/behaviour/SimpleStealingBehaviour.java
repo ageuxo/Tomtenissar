@@ -18,7 +18,7 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.tslat.smartbrainlib.api.core.behaviour.DelayedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -51,7 +51,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     protected void start(E entity) {
         LOGGER.trace( "start");
         entity.setStealing(true);
-        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.location(), 32));
+        entity.playSound(SoundEvent.createFixedRangeEvent(SoundEvents.CHEST_OPEN.getLocation(), 32));
         super.start(entity);
     }
 
@@ -63,7 +63,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
     @Override
     protected void stop(E entity) {
         entity.setStealing(false);
-        BrainUtil.clearMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
+        BrainUtils.clearMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
     }
 
     @Override
@@ -72,11 +72,11 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
             return false;
         } else if (entity.getMood() < 0){ //TODO tweak this
             LOGGER.trace( "checkExtraStartConditions, mood:{}", entity.getMood());
-            this.pos = BrainUtil.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
+            this.pos = BrainUtils.getMemory(entity, ModMemoryTypes.STEAL_TARGET.get());
             this.lastCheck = level.getGameTime();
             boolean closeEnough = this.pos.closerToCenterThan(entity.position(), this.minDistance);
             if (!closeEnough){
-                BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.pos, 1f, 1));
+                BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.pos, 1f, 1));
             }
             return closeEnough;
         }
@@ -111,7 +111,7 @@ public class SimpleStealingBehaviour<E extends BaseTomte> extends DelayedBehavio
             ItemStack stack = itemHandler.getStackInSlot(i);
             if (stack.is(ModTags.STEALABLES)){
                 int amount = Math.min(4, stack.getCount());
-                int slot = stack.get(DataComponents.CONSUMABLE) != null ? 0 : 1;
+                int slot = stack.get(DataComponents.FOOD) != null ? 0 : 1;
                 ItemStack stolen = itemHandler.extractItem(i, amount, true);
                 int simInserted = entity.itemHandler.insertItem(slot, stolen, true).getCount();
                 int simStolen = stolen.getCount();

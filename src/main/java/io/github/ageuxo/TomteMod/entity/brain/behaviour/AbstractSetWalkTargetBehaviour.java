@@ -8,7 +8,7 @@ import net.minecraft.world.entity.ai.behavior.EntityTracker;
 import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.WalkTarget;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.function.BiFunction;
@@ -43,9 +43,9 @@ public abstract class AbstractSetWalkTargetBehaviour<E extends Mob, T extends En
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        T target = BrainUtil.getMemory(entity, this.memoryType);
+        T target = BrainUtils.getMemory(entity, this.memoryType);
         if (target == null){
-            BrainUtil.clearMemory(entity, this.memoryType);
+            BrainUtils.clearMemory(entity, this.memoryType);
             return false;
         }
         if (this.predicate.test(entity, target)) {
@@ -59,8 +59,8 @@ public abstract class AbstractSetWalkTargetBehaviour<E extends Mob, T extends En
     protected void start(E entity) {
         float distance = entity.distanceTo(this.target);
         LOGGER.trace( "{} ,target {}", distance, this.target);
-        BrainUtil.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target, this.speedMod.apply(entity, this.target), this.closeEnoughDistance.apply(entity, this.target)));
-        BrainUtil.setMemory(entity, MemoryModuleType.LOOK_TARGET, new EntityTracker(this.target, false));
+        BrainUtils.setMemory(entity, MemoryModuleType.WALK_TARGET, new WalkTarget(this.target, this.speedMod.apply(entity, this.target), this.closeEnoughDistance.apply(entity, this.target)));
+        BrainUtils.setMemory(entity, MemoryModuleType.LOOK_TARGET, new EntityTracker(this.target, false));
     }
 
     @Override

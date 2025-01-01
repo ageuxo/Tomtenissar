@@ -12,7 +12,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.item.ItemStack;
 import net.tslat.smartbrainlib.api.core.behaviour.HeldBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -59,10 +59,10 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
         ItemStack handItem = entity.getMainHandItem();
         if (handItem.isEmpty()){
-            BrainUtil.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
+            BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
             return false;
         }
-        boolean consumable = handItem.get(DataComponents.CONSUMABLE) != null;
+        boolean consumable = handItem.get(DataComponents.FOOD) != null;
         return consumable && !entity.isUsingItem();
     }
 
@@ -86,7 +86,7 @@ public class EatItemInSlotBehaviour<E extends LivingEntity> extends HeldBehaviou
         this.eatingStack = null;
         LOGGER.trace( "finished");
         if (entity.getItemBySlot(this.equipmentSlot).isEmpty()){
-            BrainUtil.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
+            BrainUtils.clearMemory(entity, ModMemoryTypes.HAS_FOOD.get());
         }
     }
 }

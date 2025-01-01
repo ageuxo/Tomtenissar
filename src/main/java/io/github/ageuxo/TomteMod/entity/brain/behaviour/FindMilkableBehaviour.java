@@ -11,7 +11,7 @@ import net.minecraft.world.entity.ai.memory.MemoryModuleType;
 import net.minecraft.world.entity.ai.memory.MemoryStatus;
 import net.minecraft.world.entity.animal.Cow;
 import net.tslat.smartbrainlib.api.core.behaviour.ExtendedBehaviour;
-import net.tslat.smartbrainlib.util.BrainUtil;
+import net.tslat.smartbrainlib.util.BrainUtils;
 import org.slf4j.Logger;
 
 import java.util.List;
@@ -35,7 +35,7 @@ public class FindMilkableBehaviour<E extends LivingEntity> extends ExtendedBehav
 
     @Override
     protected boolean checkExtraStartConditions(ServerLevel level, E entity) {
-        GlobalPos pos = BrainUtil.getMemory(entity, ModMemoryTypes.MILKING_STATION.get());
+        GlobalPos pos = BrainUtils.getMemory(entity, ModMemoryTypes.MILKING_STATION.get());
         if (pos.dimension() == entity.level().dimension()){
             if (level.getBlockEntity(pos.pos()) instanceof MilkingWorkStationBE milkingStationBE){
                 if (milkingStationBE.canBeWorkedAt()){
@@ -48,7 +48,7 @@ public class FindMilkableBehaviour<E extends LivingEntity> extends ExtendedBehav
                 LOGGER.trace( "Position is not milking station: {}", pos.pos());
             }
         }
-        BrainUtil.clearMemory(entity, ModMemoryTypes.MILKING_STATION.get());
+        BrainUtils.clearMemory(entity, ModMemoryTypes.MILKING_STATION.get());
         return false;
     }
 
@@ -57,7 +57,7 @@ public class FindMilkableBehaviour<E extends LivingEntity> extends ExtendedBehav
         List<Cow> cowList = this.milkingStation.getWorkableAnimals();
         if (!cowList.isEmpty()){
             Cow cow = cowList.get(entity.getRandom().nextInt(cowList.size()));
-            BrainUtil.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, cow);
+            BrainUtils.setMemory(entity, MemoryModuleType.INTERACTION_TARGET, cow);
         } else {
             LOGGER.trace( "No valid target in cowList");
         }

@@ -3,8 +3,8 @@ package io.github.ageuxo.TomteMod;
 import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
+import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationItemRenderer;
 import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationRenderer;
-import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkstationSpecialRenderer;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -16,15 +16,20 @@ import io.github.ageuxo.TomteMod.gui.ShearingStationScreen;
 import io.github.ageuxo.TomteMod.gui.SimpleContainerScreen;
 import io.github.ageuxo.TomteMod.item.ModCreativeTabs;
 import io.github.ageuxo.TomteMod.item.ModItems;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.event.RegisterSpecialModelRendererEvent;
+import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
+import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.slf4j.Logger;
@@ -75,9 +80,24 @@ public class TomteMod {
             event.register(ModMenuTypes.SHEARING_STATION.get(), ShearingStationScreen::new);
         }
 
+        public static final IClientItemExtensions WORK_STATION_EXTENSIONS = new IClientItemExtensions() {
+            @Override
+            public BlockEntityWithoutLevelRenderer getCustomRenderer() {
+                return AnimalWorkStationItemRenderer.INSTANCE;
+            }
+        };
+
         @SubscribeEvent
-        public static void registerSpecialRenderers(RegisterSpecialModelRendererEvent event) {
-            event.register(AnimalWorkstationSpecialRenderer.ID, AnimalWorkstationSpecialRenderer.Unbaked.MAP_CODEC);
+        public static void registerClientExtensions(RegisterClientExtensionsEvent event) {
+            event.registerItem(WORK_STATION_EXTENSIONS, ModBlocks.MILKING_WORK_STATION.asItem(), ModBlocks.SHEARING_WORK_STATION.asItem());
+        }
+
+        @SubscribeEvent
+        public static void onClientSetup(FMLClientSetupEvent event){
+            EntityRenderers.register(ModEntities.TOMTE.get(), BaseTomteRenderer::new);
+
+            Minecraft minecraft = Minecraft.getInstance();
+            AnimalWorkStationItemRenderer.INSTANCE = new AnimalWorkStationItemRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels());
         }
     }
 }
