@@ -1,6 +1,5 @@
 package io.github.ageuxo.TomteMod.datagen;
 
-import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.TomteMod;
 import io.github.ageuxo.TomteMod.item.ModItems;
 import net.minecraft.data.PackOutput;
@@ -18,8 +17,7 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        var test = spawnEgg(ModItems.TOMTE_EGG);
-        LogUtils.getLogger().info(test.toString());
+        spawnEgg(ModItems.TOMTE_EGG);
     }
 
     private ItemModelBuilder spawnEgg(DeferredItem<? extends Item> item){
