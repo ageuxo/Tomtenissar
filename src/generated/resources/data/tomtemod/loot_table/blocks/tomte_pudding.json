@@ -1,0 +1,34 @@
+{
+  "type": "minecraft:block",
+  "pools": [
+    {
+      "bonus_rolls": 0.0,
+      "entries": [
+        {
+          "type": "minecraft:alternatives",
+          "children": [
+            {
+              "type": "minecraft:item",
+              "conditions": [
+                {
+                  "block": "tomtemod:tomte_pudding",
+                  "condition": "minecraft:block_state_property",
+                  "properties": {
+                    "filled": "true"
+                  }
+                }
+              ],
+              "name": "tomtemod:tomte_pudding"
+            },
+            {
+              "type": "minecraft:item",
+              "name": "minecraft:bowl"
+            }
+          ]
+        }
+      ],
+      "rolls": 1.0
+    }
+  ],
+  "random_sequence": "tomtemod:blocks/tomte_pudding"
+}

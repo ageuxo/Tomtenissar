@@ -1,9 +1,6 @@
 package io.github.ageuxo.TomteMod;
 
-import io.github.ageuxo.TomteMod.datagen.ModBlockStateProvider;
-import io.github.ageuxo.TomteMod.datagen.ModItemModelProvider;
-import io.github.ageuxo.TomteMod.datagen.ModRecipeProvider;
-import io.github.ageuxo.TomteMod.datagen.ModTagsProviders;
+import io.github.ageuxo.TomteMod.datagen.*;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import net.minecraft.core.HolderLookup;
@@ -32,5 +29,6 @@ public class ModEvents {
         generator.addProvider(true, new ModItemModelProvider(packOutput, fileHelper));
         ModTagsProviders.addAll(generator, packOutput, lookup);
         generator.addProvider(true, new ModRecipeProvider(packOutput, lookup));
+        generator.addProvider(true, new ModLootProvider(packOutput, lookup));
     }
 }
