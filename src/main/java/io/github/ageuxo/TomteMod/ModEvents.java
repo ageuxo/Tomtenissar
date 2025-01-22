@@ -30,5 +30,6 @@ public class ModEvents {
         ModTagsProviders.addAll(generator, packOutput, lookup);
         generator.addProvider(true, new ModRecipeProvider(packOutput, lookup));
         generator.addProvider(true, new ModLootProvider(packOutput, lookup));
+        generator.addProvider(true, new ModParticleDescriptionProvider(packOutput, fileHelper));
     }
 }

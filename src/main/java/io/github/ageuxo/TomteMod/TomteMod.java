@@ -5,6 +5,7 @@ import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.entity.ModBlockEntities;
 import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationItemRenderer;
 import io.github.ageuxo.TomteMod.block.entity.render.AnimalWorkStationRenderer;
+import io.github.ageuxo.TomteMod.client.SteamParticleProvider;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
 import io.github.ageuxo.TomteMod.entity.brain.ModMemoryTypes;
 import io.github.ageuxo.TomteMod.entity.brain.ModSensors;
@@ -28,6 +29,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 import net.neoforged.neoforge.common.NeoForge;
@@ -49,6 +51,7 @@ public class TomteMod {
         ModPoiTypes.register(eventBus);
         ModMenuTypes.register(eventBus);
         ModCreativeTabs.register(eventBus);
+        ModParticles.register(eventBus);
 
         eventBus.register(ModEvents.class);
         NeoForge.EVENT_BUS.register(ForgeEvents.class);
@@ -99,5 +102,11 @@ public class TomteMod {
             Minecraft minecraft = Minecraft.getInstance();
             AnimalWorkStationItemRenderer.INSTANCE = new AnimalWorkStationItemRenderer(minecraft.getBlockEntityRenderDispatcher(), minecraft.getEntityModels());
         }
+
+        @SubscribeEvent
+        public static void particleProviders(RegisterParticleProvidersEvent event) {
+            event.registerSpriteSet(ModParticles.STEAM.get(), SteamParticleProvider::new);
+        }
+
     }
 }
