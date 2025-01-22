@@ -1,0 +1,17 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "tomtemod:block/tomte_pudding"
+      }
+    },
+    {
+      "apply": {
+        "model": "tomtemod:block/pudding"
+      },
+      "when": {
+        "filled": "true"
+      }
+    }
+  ]
+}

@@ -9,8 +9,6 @@ import io.github.ageuxo.TomteMod.gui.ShearingWorkStationMenu;
 import io.github.ageuxo.TomteMod.gui.MilkingWorkStationMenu;
 import io.github.ageuxo.TomteMod.item.WorkStationItem;
 import io.github.ageuxo.TomteMod.item.ModItems;
-import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -19,6 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
+import net.minecraft.world.level.material.PushReaction;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -28,8 +27,12 @@ import java.util.function.Supplier;
 public class ModBlocks {
     public static final DeferredRegister.Blocks BLOCKS = DeferredRegister.createBlocks(TomteMod.MODID);
 
-    public static final DeferredBlock<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION = registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new, ShearingWorkStationBE::new, WorkStationItem.Type.SHEARING);
-    public static final DeferredBlock<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION = registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new, WorkStationItem.Type.MILKING);
+    public static final DeferredBlock<SimpleWorkStationBlock<ShearingWorkStationBE>> SHEARING_WORK_STATION =
+            registerWorkStation("shearing", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), ShearingWorkStationMenu::new, ShearingWorkStationBE::new, WorkStationItem.Type.SHEARING);
+    public static final DeferredBlock<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION =
+            registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new, WorkStationItem.Type.MILKING);
+    public static final DeferredBlock<TomtePudding> TOMTE_PUDDING =
+            BLOCKS.register("tomte_pudding", ()-> new TomtePudding(BlockBehaviour.Properties.of().sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)));
 
     protected static <T extends Block> DeferredBlock<T> registerBlockWithItem(String name, Supplier<T> blockSupplier){
         DeferredBlock<T> ret = BLOCKS.register(name, blockSupplier);

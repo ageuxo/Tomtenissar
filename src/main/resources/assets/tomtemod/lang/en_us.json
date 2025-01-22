@@ -6,7 +6,12 @@
   "entity.tomtemod.tomte": "Tomte",
   "block.tomtemod.milking_station": "Milking workstation",
   "block.tomtemod.shearing_station": "Shearing workstation",
+  "block.tomtemod.tomte_pudding": "Tomte Pudding",
   "item.tomtemod.milking_station": "Milking workstation",
   "item.tomtemod.shearing_station": "Shearing workstation",
-  "item.tomtemod.tomte_egg": "Tomte Egg"
+  "item.tomtemod.tomte_egg": "Tomte Egg",
+  "item.tomtemod.yule_grain": "Yule Grain",
+  "item.tomtemod.raw_pudding": "Raw Pudding",
+  "info.tomtemod.pudding.eat": "This pudding is for the Tomte, not for you!",
+  "info.tomtemod.pudding.desc": "Leave this out overnight to summon a Tomte."
 }

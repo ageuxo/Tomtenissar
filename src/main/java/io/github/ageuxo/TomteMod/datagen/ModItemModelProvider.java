@@ -18,6 +18,9 @@ public class ModItemModelProvider extends ItemModelProvider {
     @Override
     protected void registerModels() {
         spawnEgg(ModItems.TOMTE_EGG);
+        basicItem(ModItems.TOMTE_PUDDING_ITEM.getId());
+        basicItem(ModItems.YULE_GRAIN.getId());
+        basicItem(ModItems.RAW_PUDDING.getId());
     }
 
     private ItemModelBuilder spawnEgg(DeferredItem<? extends Item> item){

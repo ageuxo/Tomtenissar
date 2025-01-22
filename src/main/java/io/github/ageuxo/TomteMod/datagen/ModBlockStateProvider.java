@@ -2,9 +2,11 @@ package io.github.ageuxo.TomteMod.datagen;
 
 import io.github.ageuxo.TomteMod.TomteMod;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
+import io.github.ageuxo.TomteMod.block.TomtePudding;
 import net.minecraft.data.PackOutput;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.client.model.generators.BlockStateProvider;
+import net.neoforged.neoforge.client.model.generators.MultiPartBlockStateBuilder;
 import net.neoforged.neoforge.common.data.ExistingFileHelper;
 import net.neoforged.neoforge.registries.DeferredBlock;
 
@@ -19,6 +21,14 @@ public class ModBlockStateProvider extends BlockStateProvider {
         entityModel(ModBlocks.SHEARING_WORK_STATION);
         horizontalBlock(ModBlocks.MILKING_WORK_STATION.get(), models().getExistingFile(TomteMod.modRL("block/work_station")));
         entityModel(ModBlocks.MILKING_WORK_STATION);
+        puddingModel();
+    }
+
+    private void puddingModel() {
+        MultiPartBlockStateBuilder builder = getMultipartBuilder(ModBlocks.TOMTE_PUDDING.get());
+        builder.part().modelFile(models().getExistingFile(TomteMod.modRL("block/tomte_pudding"))).addModel().end();
+        builder.part().modelFile(models().getExistingFile(TomteMod.modRL("block/pudding"))).addModel()
+                .condition(TomtePudding.FILLED, true).end();
     }
 
     public void entityModel(DeferredBlock<? extends Block> registryObject){
