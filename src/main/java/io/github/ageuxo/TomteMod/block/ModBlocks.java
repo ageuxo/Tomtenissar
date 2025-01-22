@@ -32,7 +32,7 @@ public class ModBlocks {
     public static final DeferredBlock<SimpleWorkStationBlock<MilkingWorkStationBE>> MILKING_WORK_STATION =
             registerWorkStation("milking", BlockBehaviour.Properties.of().mapColor(MapColor.WOOD).instrument(NoteBlockInstrument.BELL).strength(2.5F).sound(SoundType.WOOD).noOcclusion(), MilkingWorkStationMenu::new, MilkingWorkStationBE::new, WorkStationItem.Type.MILKING);
     public static final DeferredBlock<TomtePudding> TOMTE_PUDDING =
-            BLOCKS.register("tomte_pudding", ()-> new TomtePudding(BlockBehaviour.Properties.of().sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY)));
+            BLOCKS.register("tomte_pudding", ()-> new TomtePudding(BlockBehaviour.Properties.of().sound(SoundType.WOOD).pushReaction(PushReaction.DESTROY).randomTicks()));
 
     protected static <T extends Block> DeferredBlock<T> registerBlockWithItem(String name, Supplier<T> blockSupplier){
         DeferredBlock<T> ret = BLOCKS.register(name, blockSupplier);

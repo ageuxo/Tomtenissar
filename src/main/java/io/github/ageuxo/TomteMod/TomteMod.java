@@ -32,7 +32,6 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.client.event.RegisterParticleProvidersEvent;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
-import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.NeoForgeMod;
 import org.slf4j.Logger;
 
@@ -54,7 +53,6 @@ public class TomteMod {
         ModParticles.register(eventBus);
 
         eventBus.register(ModEvents.class);
-        NeoForge.EVENT_BUS.register(ForgeEvents.class);
 
         NeoForgeMod.enableMilkFluid();
     }

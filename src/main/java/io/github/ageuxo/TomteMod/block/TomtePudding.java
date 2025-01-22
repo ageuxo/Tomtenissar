@@ -1,11 +1,16 @@
 package io.github.ageuxo.TomteMod.block;
 
+import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.ModParticles;
+import io.github.ageuxo.TomteMod.entity.BaseTomte;
+import io.github.ageuxo.TomteMod.entity.ModEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.MobSpawnType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -13,14 +18,18 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.event.EventHooks;
+import org.slf4j.Logger;
 
 public class TomtePudding extends Block {
     public static final BooleanProperty FILLED = BooleanProperty.create("filled");
     public static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 2, 12);
+    public static final Logger LOGGER = LogUtils.getLogger();
 
     public TomtePudding(Properties properties) {
         super(properties);
@@ -48,6 +57,24 @@ public class TomtePudding extends Block {
     @Override
     protected VoxelShape getShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
         return SHAPE;
+    }
+
+    @Override
+    protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
+        if (!level.isDay() && (random.nextInt(100) == 0)){
+            if (level.getEntities(ModEntities.TOMTE.get(), new AABB(pos).inflate(16), e -> true).isEmpty()) {
+
+                BaseTomte tomte = new BaseTomte(ModEntities.TOMTE.get(), level);
+                EventHooks.finalizeMobSpawn(tomte, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
+                level.addFreshEntity(tomte);
+                tomte.setPos(pos.getBottomCenter());
+
+                level.setBlockAndUpdate(pos, state.setValue(FILLED, false));
+                LOGGER.debug("Spawning tomte");
+            } else {
+                LOGGER.debug("Found tomte in range, cancel spawning");
+            }
+        }
     }
 
     @Override
