@@ -1,6 +1,5 @@
 package io.github.ageuxo.TomteMod.block;
 
-import com.mojang.logging.LogUtils;
 import io.github.ageuxo.TomteMod.ModParticles;
 import io.github.ageuxo.TomteMod.entity.BaseTomte;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
@@ -24,12 +23,10 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.neoforge.event.EventHooks;
-import org.slf4j.Logger;
 
 public class TomtePudding extends Block {
     public static final BooleanProperty FILLED = BooleanProperty.create("filled");
     public static final VoxelShape SHAPE = Block.box(4, 0, 4, 12, 2, 12);
-    public static final Logger LOGGER = LogUtils.getLogger();
 
     public TomtePudding(Properties properties) {
         super(properties);
@@ -71,9 +68,6 @@ public class TomtePudding extends Block {
                     tomte.setPos(pos.getBottomCenter());
 
                     level.setBlockAndUpdate(pos, state.setValue(FILLED, false));
-                    LOGGER.debug("Spawning tomte");
-                } else {
-                    LOGGER.debug("Found tomte in range, cancel spawning");
                 }
             }
         }

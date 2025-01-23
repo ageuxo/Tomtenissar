@@ -80,7 +80,6 @@ import java.util.function.Predicate;
 public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomte>, MoodyMob {
     private static final Logger LOGGER = LogUtils.getLogger();
     public static final String MOOD_NBT_KEY = "tomte_mood";
-    public static final String ORIGIN_KEY = "tomte_origin";
     private static final EntityDataAccessor<Boolean> ATTACKING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> STEALING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> EATING = SynchedEntityData.defineId(BaseTomte.class, EntityDataSerializers.BOOLEAN);
@@ -240,7 +239,7 @@ public class BaseTomte extends PathfinderMob implements SmartBrainOwner<BaseTomt
                                 new SimpleStealingBehaviour<>(),
 
                                 new FirstApplicableBehaviour<>( // Chores
-                                        new FirstApplicableBehaviour<>( // Find chore TODO finish this
+                                        new FirstApplicableBehaviour<>( // Find chore
                                                 new FindMilkableBehaviour<>().cooldownFor(entity -> 20),
                                                 new FindShearableBehaviour<>().cooldownFor(entity -> 20)
                                         ),
