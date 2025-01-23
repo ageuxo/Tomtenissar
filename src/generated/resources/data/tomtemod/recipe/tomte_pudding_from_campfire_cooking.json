@@ -1,0 +1,13 @@
+{
+  "type": "minecraft:campfire_cooking",
+  "category": "food",
+  "cookingtime": 600,
+  "experience": 1.0,
+  "ingredient": {
+    "item": "tomtemod:raw_pudding"
+  },
+  "result": {
+    "count": 1,
+    "id": "tomtemod:tomte_pudding"
+  }
+}

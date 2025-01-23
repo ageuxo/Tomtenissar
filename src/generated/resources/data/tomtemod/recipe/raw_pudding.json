@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "B": {
+      "item": "minecraft:bowl"
+    },
+    "G": {
+      "item": "tomtemod:yule_grain"
+    },
+    "M": {
+      "item": "minecraft:milk_bucket"
+    }
+  },
+  "pattern": [
+    "G",
+    "M",
+    "B"
+  ],
+  "result": {
+    "count": 1,
+    "id": "tomtemod:raw_pudding"
+  }
+}

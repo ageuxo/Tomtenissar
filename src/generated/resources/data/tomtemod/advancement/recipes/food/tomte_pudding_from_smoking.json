@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_raw_pudding": {
+      "conditions": {
+        "items": [
+          {
+            "items": "tomtemod:raw_pudding"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "tomtemod:tomte_pudding_from_smoking"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_raw_pudding"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "tomtemod:tomte_pudding_from_smoking"
+    ]
+  }
+}

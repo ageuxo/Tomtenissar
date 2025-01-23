@@ -1,0 +1,32 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "tomtemod:raw_pudding"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    },
+    "has_yule_grain": {
+      "conditions": {
+        "items": [
+          {
+            "items": "tomtemod:yule_grain"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_yule_grain"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "tomtemod:raw_pudding"
+    ]
+  }
+}
