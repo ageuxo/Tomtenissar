@@ -81,7 +81,7 @@ public class TomtePudding extends Block {
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (state.getValue(FILLED) && random.nextInt(15) == 0) {
+        if (state.getValue(FILLED) && random.nextInt(100) == 0) {
             Vec3 center = pos.getCenter();
             int spread = 6;
             level.addParticle(ModParticles.STEAM.get(),
