@@ -13,5 +13,6 @@
   "item.tomtemod.yule_grain": "Yule Grain",
   "item.tomtemod.raw_pudding": "Raw Pudding",
   "info.tomtemod.pudding.eat": "This pudding is for the Tomte, not for you!",
-  "info.tomtemod.pudding.desc": "Leave this out overnight to summon a Tomte."
+  "info.tomtemod.pudding.desc": "Leave this out overnight to summon a Tomte.",
+  "info.tomtemod.raw_pudding.desc": "If this was warm, it would make a perfect treat."
 }

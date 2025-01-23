@@ -3,7 +3,10 @@ package io.github.ageuxo.TomteMod.item;
 import io.github.ageuxo.TomteMod.TomteMod;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
+import net.minecraft.ChatFormatting;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Rarity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.DeferredSpawnEggItem;
 import net.neoforged.neoforge.registries.DeferredItem;
@@ -13,9 +16,9 @@ public class ModItems {
     public static final DeferredRegister.Items ITEMS = DeferredRegister.createItems(TomteMod.MODID);
 
     public static final DeferredItem<DeferredSpawnEggItem> TOMTE_EGG = ITEMS.register("tomte_egg", ()->new DeferredSpawnEggItem(ModEntities.TOMTE, 0x591900, 0x153C26, new Item.Properties()));
-    public static final DeferredItem<TomtePuddingItem> TOMTE_PUDDING_ITEM = ITEMS.register("tomte_pudding", ()-> new TomtePuddingItem(ModBlocks.TOMTE_PUDDING.get(), new Item.Properties()));
-    public static final DeferredItem<Item> YULE_GRAIN = ITEMS.register("yule_grain", ()->new Item(new Item.Properties()));
-    public static final DeferredItem<Item> RAW_PUDDING = ITEMS.register("raw_pudding", ()->new Item(new Item.Properties()));
+    public static final DeferredItem<TomtePuddingItem> TOMTE_PUDDING_ITEM = ITEMS.register("tomte_pudding", ()-> new TomtePuddingItem(ModBlocks.TOMTE_PUDDING.get(), new Item.Properties().rarity(Rarity.EPIC)));
+    public static final DeferredItem<Item> YULE_GRAIN = ITEMS.register("yule_grain", ()->new Item(new Item.Properties().rarity(Rarity.RARE)));
+    public static final DeferredItem<Item> RAW_PUDDING = ITEMS.register("raw_pudding", ()->new DescriptionItem(new Item.Properties().rarity(Rarity.RARE), Component.translatable("info.tomtemod.raw_pudding.desc").withStyle(ChatFormatting.GRAY)));
 
     public static void register(IEventBus bus){
         ITEMS.register(bus);
