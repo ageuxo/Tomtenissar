@@ -31,5 +31,6 @@ public class ModEvents {
         generator.addProvider(true, new ModRecipeProvider(packOutput, lookup));
         generator.addProvider(true, new ModLootProvider(packOutput, lookup));
         generator.addProvider(true, new ModParticleDescriptionProvider(packOutput, fileHelper));
+        generator.addProvider(true, new ModGLMProvider(packOutput, lookup));
     }
 }

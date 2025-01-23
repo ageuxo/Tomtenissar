@@ -1,5 +1,6 @@
 package io.github.ageuxo.TomteMod.datagen;
 
+import io.github.ageuxo.TomteMod.ModLootTables;
 import io.github.ageuxo.TomteMod.block.ModBlocks;
 import io.github.ageuxo.TomteMod.block.TomtePudding;
 import io.github.ageuxo.TomteMod.entity.ModEntities;
@@ -10,6 +11,8 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.loot.BlockLootSubProvider;
 import net.minecraft.data.loot.EntityLootSubProvider;
 import net.minecraft.data.loot.LootTableProvider;
+import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.item.Items;
@@ -19,14 +22,17 @@ import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
+import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.LootItemBlockStatePropertyCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public class ModLootProvider extends LootTableProvider{
@@ -35,8 +41,9 @@ public class ModLootProvider extends LootTableProvider{
         super(output,
                 Set.of(),
                 List.of(
-                        new LootTableProvider.SubProviderEntry(ModBlockLootProvider::new, LootContextParamSets.BLOCK),
-                        new LootTableProvider.SubProviderEntry(ModEntityLootProvider::new, LootContextParamSets.ENTITY)
+                        new SubProviderEntry(ModBlockLootProvider::new, LootContextParamSets.BLOCK),
+                        new SubProviderEntry(ModEntityLootProvider::new, LootContextParamSets.ENTITY),
+                        new SubProviderEntry(ModChestLootProvider::new, LootContextParamSets.CHEST)
                 ),
                 registries);
     }
@@ -103,6 +110,29 @@ public class ModLootProvider extends LootTableProvider{
                                             )
                             )
                     );
+        }
+    }
+
+    public static class ModChestLootProvider implements LootTableSubProvider {
+
+        public ModChestLootProvider(HolderLookup.Provider registries) {
+        }
+
+        @Override
+        public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> output) {
+            output.accept(ModLootTables.MINESHAFT_ADDITIONS,
+                    LootTable.lootTable()
+                            .withPool(
+                                    LootPool.lootPool()
+                                            .setRolls(UniformGenerator.between(0, 3))
+                                            .add(
+                                                    LootItem.lootTableItem(ModItems.YULE_GRAIN)
+                                            )
+                                            .apply(
+                                                    SetItemCountFunction.setCount(UniformGenerator.between(0, 1))
+                                            )
+
+                            ));
         }
     }
 }
