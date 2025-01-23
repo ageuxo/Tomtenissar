@@ -61,7 +61,7 @@ public class TomtePudding extends Block {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (level.isClientSide && !level.isDay()) {
+        if (!level.isClientSide && !level.isDay()) {
             if (random.nextInt(15) == 0) {
                 if (level.getEntities(ModEntities.TOMTE.get(), new AABB(pos).inflate(16), e -> true).isEmpty()) {
 
