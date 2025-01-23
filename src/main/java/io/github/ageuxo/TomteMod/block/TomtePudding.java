@@ -61,18 +61,20 @@ public class TomtePudding extends Block {
 
     @Override
     protected void randomTick(BlockState state, ServerLevel level, BlockPos pos, RandomSource random) {
-        if (!level.isDay() && (random.nextInt(100) == 0)){
-            if (level.getEntities(ModEntities.TOMTE.get(), new AABB(pos).inflate(16), e -> true).isEmpty()) {
+        if (level.isClientSide && !level.isDay()) {
+            if (random.nextInt(15) == 0) {
+                if (level.getEntities(ModEntities.TOMTE.get(), new AABB(pos).inflate(16), e -> true).isEmpty()) {
 
-                BaseTomte tomte = new BaseTomte(ModEntities.TOMTE.get(), level);
-                EventHooks.finalizeMobSpawn(tomte, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
-                level.addFreshEntity(tomte);
-                tomte.setPos(pos.getBottomCenter());
+                    BaseTomte tomte = new BaseTomte(ModEntities.TOMTE.get(), level);
+                    EventHooks.finalizeMobSpawn(tomte, level, level.getCurrentDifficultyAt(pos), MobSpawnType.EVENT, null);
+                    level.addFreshEntity(tomte);
+                    tomte.setPos(pos.getBottomCenter());
 
-                level.setBlockAndUpdate(pos, state.setValue(FILLED, false));
-                LOGGER.debug("Spawning tomte");
-            } else {
-                LOGGER.debug("Found tomte in range, cancel spawning");
+                    level.setBlockAndUpdate(pos, state.setValue(FILLED, false));
+                    LOGGER.debug("Spawning tomte");
+                } else {
+                    LOGGER.debug("Found tomte in range, cancel spawning");
+                }
             }
         }
     }
